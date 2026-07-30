@@ -141,13 +141,16 @@ air_explain <- function(code) {
 #' @export
 air_debug <- function(error_msg = NULL) {
   if (is.null(error_msg)) {
-    error_msg <- geterrmessage()
-    if (error_msg == "") stop("No error to debug. Provide error_msg or run after an error.")
+    error_msg <- tryCatch(geterrmessage(), error = function(e) "")
+    if (is.null(error_msg) || nchar(error_msg) == 0) {
+      stop("No error to debug. Provide error_msg or run air_debug() immediately after an error occurs.")
+    }
   }
-  trace <- paste(capture.output(traceback()), collapse = "\n")
+  trace <- tryCatch(paste(utils::capture.output(traceback()), collapse = "\n"),
+                    error = function(e) "(traceback unavailable)")
   prompt <- paste0(
     "I got this R error:\n\n", error_msg, "\n\n",
-    "Traceback:\n", trace, "\n\n",
+    if (nchar(trace) > 0) paste0("Traceback:\n", trace, "\n\n") else "",
     "Explain the root cause and suggest a fix."
   )
   air_send(prompt)
@@ -220,6 +223,9 @@ air_info <- function() {
   cli::cli_li("Model: {air_env$model}")
   cli::cli_li("Base URL: {air_env$base_url}")
   cli::cli_li("Temperature: {air_env$temperature}")
+  cli::cli_li("Max tokens: {air_env$max_tokens}")
   cli::cli_li("History length: {length(air_env$chat_history)}")
+  cli::cli_text("")
+  cli::cli_text("Run {.fn air_check} to test connectivity.")
   invisible(NULL)
 }
