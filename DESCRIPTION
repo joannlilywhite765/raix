@@ -4,18 +4,17 @@ Title: AI for R — Live AI Assistance in RStudio
 Version: 0.4.1
 Authors@R: c(
     person("Mahesh", "Solanki", email = "maheshsinh1910@gmail.com",
-           role = c("aut", "cre"),
-           comment = c(ORCID = "0009-0000-0000-0000")))
+           role = c("aut", "cre")))
+Author: Mahesh Solanki
+Maintainer: Mahesh Solanki <maheshsinh1910@gmail.com>
 Description: Bring AI-powered coding assistance directly into your R workflow.
     Chat with AI models, get code explanations, debug errors, generate documentation,
     and create R code from natural language — all without leaving RStudio.
-    Supports OpenAI (GPT-4o, GPT-3.5), Ollama (Llama, Mistral, locally),
-    Anthropic Claude, DeepSeek, Kimi, and Z.Ai backends.
+    Works with any OpenAI-compatible API, Ollama, or Anthropic Claude.
 License: MIT + file LICENSE
 URL: https://github.com/twomathematicians-code/air
 BugReports: https://github.com/twomathematicians-code/air/issues
 Encoding: UTF-8
-RoxygenNote: 7.3.0
 Imports:
     httr,
     jsonlite,
