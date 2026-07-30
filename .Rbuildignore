@@ -1,6 +1,13 @@
 ^.*\.Rproj$
 ^\.github$
+^\.git$
+^\.gitignore$
 ^README\.md$
 ^LICENSE$
 ^test_.*\.R$
 ^test_.*
+^\.\.Rcheck$
+^create_man\.R$
+^create_demo_gif\.py$
+^raix.*\.tar\.gz$
+^raix\.Rcheck$

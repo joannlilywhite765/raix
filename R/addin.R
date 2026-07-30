@@ -1,4 +1,4 @@
-# AIR RStudio Add-in — Quick Chat
+# AIR RStudio Add-in --- Quick Chat
 #
 # Adds an RStudio Add-in that opens the AIR GUI directly
 

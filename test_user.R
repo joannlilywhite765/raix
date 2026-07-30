@@ -11,14 +11,14 @@ cat("OK\n")
 cat("3. Exported functions:", paste(ls("package:raix"), collapse = ", "), "\n")
 
 cat("4. Configure ollama...")
-air_configure(backend = "ollama")
+air_configure(provider = "ollama")
 cat("OK\n")
 
 cat("5. air_info:\n")
 air_info()
 
 cat("\n6. Error handling (dead port): ")
-air_configure(backend = "ollama", base_url = "http://127.0.0.1:1")
+air_configure(provider = "ollama", base_url = "http://127.0.0.1:1")
 r <- tryCatch(air_send("test"), error = function(e) "CAUGHT")
 cat(r, "\n")
 

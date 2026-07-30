@@ -1,12 +1,12 @@
-# AIR — Beginner-Friendly Utilities
+# AIR --- Beginner-Friendly Utilities
 #
-# air_setup()    — guided first-time setup wizard
-# air_search()   — search CRAN packages
-# air_diagnose() — diagnose R script/project issues
-# air_analyze()  — guided data analysis assistant
-# air_google()   — search Google from R console
-# air_rstudio()  — RStudio integration helper
-# air_help()     — beginner-friendly help menu
+# air_setup()    --- guided first-time setup wizard
+# air_search()   --- search CRAN packages
+# air_diagnose() --- diagnose R script/project issues
+# air_analyze()  --- guided data analysis assistant
+# air_google()   --- search Google from R console
+# air_rstudio()  --- RStudio integration helper
+# air_help()     --- beginner-friendly help menu
 
 #' Guided first-time setup wizard
 #'
@@ -15,7 +15,7 @@
 #'
 #' @export
 air_setup <- function() {
-  cli::cli_h1("Welcome to AIR — AI for R!")
+  cli::cli_h1("Welcome to AIR --- AI for R!")
   cli::cli_text("")
   cli::cli_text("This wizard helps you connect to ANY AI model in under 2 minutes.")
   cli::cli_text("")
@@ -23,15 +23,15 @@ air_setup <- function() {
   # Step 1: Choose provider
   cli::cli_h3("Step 1: Choose your AI provider")
   cli::cli_bullets(c(
-    "*" = "Ollama — FREE, local, private (recommended for beginners)",
-    "*" = "OpenAI — GPT-4o, most capable, requires API key",
-    "*" = "Claude — Anthropic, great for reasoning",
-    "*" = "Groq — Fast, free tier available",
-    "*" = "Together AI — Many open-source models",
-    "*" = "Mistral — European AI provider",
-    "*" = "DeepSeek — Affordable code generation",
-    "*" = "LM Studio / vLLM — Local OpenAI-compatible servers",
-    "*" = "custom — ANY OpenAI-compatible endpoint (bring your own URL)"
+    "*" = "Ollama --- FREE, local, private (recommended for beginners)",
+    "*" = "OpenAI --- GPT-4o, most capable, requires API key",
+    "*" = "Claude --- Anthropic, great for reasoning",
+    "*" = "Groq --- Fast, free tier available",
+    "*" = "Together AI --- Many open-source models",
+    "*" = "Mistral --- European AI provider",
+    "*" = "DeepSeek --- Affordable code generation",
+    "*" = "LM Studio / vLLM --- Local OpenAI-compatible servers",
+    "*" = "custom --- ANY OpenAI-compatible endpoint (bring your own URL)"
   ))
   cat("\n")
   choice <- readline(cli::col_blue("Provider [ollama/openai/claude/groq/together/mistral/deepseek/lmstudio/vllm/custom]: "))
@@ -70,21 +70,21 @@ air_setup <- function() {
   if (isTRUE(reachable)) {
     cli::cli_alert_success("Connected! You are ready to go.")
   } else {
-    cli::cli_alert_warning("Could not reach the backend. You can still use AIR — just make sure your backend is running.")
+    cli::cli_alert_warning("Could not reach the backend. You can still use AIR --- just make sure your backend is running.")
   }
 
   # Step 4: Quick tutorial
-  cli::cli_h3("Step 4: Quick tutorial — try these commands!")
+  cli::cli_h3("Step 4: Quick tutorial --- try these commands!")
   cli::cli_bullets(c(
-    "*" = "{.code air_explain(\"mean\")} — Ask AIR to explain R code",
-    "*" = "{.code air_generate(\"Create a bar chart\")} — Generate R code from words",
-    "*" = "{.code air_debug()} — Debug your last error",
-    "*" = "{.code air_chat()} — Start an interactive chat",
-    "*" = "{.code air_search(\"ggplot2\")} — Search CRAN packages",
-    "*" = "{.code air_analyze(mtcars)} — Get help analyzing a dataset",
-    "*" = "{.code air_diagnose(\"my_script.R\")} — Diagnose script issues",
-    "*" = "{.code air_google(\"R tutorial\")} — Search Google from R",
-    "*" = "{.code air_help()} — See all available commands"
+    "*" = "{.code air_explain(\"mean\")} --- Ask AIR to explain R code",
+    "*" = "{.code air_generate(\"Create a bar chart\")} --- Generate R code from words",
+    "*" = "{.code air_debug()} --- Debug your last error",
+    "*" = "{.code air_chat()} --- Start an interactive chat",
+    "*" = "{.code air_search(\"ggplot2\")} --- Search CRAN packages",
+    "*" = "{.code air_analyze(mtcars)} --- Get help analyzing a dataset",
+    "*" = "{.code air_diagnose(\"my_script.R\")} --- Diagnose script issues",
+    "*" = "{.code air_google(\"R tutorial\")} --- Search Google from R",
+    "*" = "{.code air_help()} --- See all available commands"
   ))
 
   cli::cli_text("")
@@ -136,7 +136,7 @@ air_search <- function(topic, n = 10) {
         if (sum(scores[top]) > 0) {
           cat("\n"); cli::cli_h3("CRAN packages matching '{topic}':")
           for (i in seq_len(nrow(result))) {
-            cli::cli_bullets(c("*" = "{.pkg {result$Package[i]}} — {result$Title[i]}"))
+            cli::cli_bullets(c("*" = "{.pkg {result$Package[i]}} --- {result$Title[i]}"))
           }
           return(invisible(result))
         }
@@ -149,7 +149,7 @@ air_search <- function(topic, n = 10) {
   prompt <- paste0(
     "A user needs R packages for: ", topic, ". ",
     "Suggest the top 5 most popular CRAN packages. ",
-    "Output format: package_name — short description."
+    "Output format: package_name --- short description."
   )
   result <- tryCatch(air_send(prompt), error = function(e) NULL)
   if (!is.null(result)) {
@@ -204,9 +204,9 @@ air_diagnose <- function(path = ".") {
   installed <- pkgs %in% rownames(installed.packages())
   for (i in seq_along(pkgs)) {
     if (installed[i]) {
-      cli::cli_alert_success("{.pkg {pkgs[i]}} — installed")
+      cli::cli_alert_success("{.pkg {pkgs[i]}} --- installed")
     } else {
-      cli::cli_alert_danger("{.pkg {pkgs[i]}} — NOT installed. Run {.code install.packages('{pkgs[i]}')}")
+      cli::cli_alert_danger("{.pkg {pkgs[i]}} --- NOT installed. Run {.code install.packages('{pkgs[i]}')}")
       issues <- issues + 1
     }
   }
@@ -218,7 +218,7 @@ air_diagnose <- function(path = ".") {
   for (f in all_files) {
     parsed <- tryCatch(parse(file = f), error = function(e) e)
     if (inherits(parsed, "error")) {
-      cli::cli_alert_danger("{.file {f}} — syntax error: {parsed$message}")
+      cli::cli_alert_danger("{.file {f}} --- syntax error: {parsed$message}")
       issues <- issues + 1
     }
   }
@@ -228,14 +228,14 @@ air_diagnose <- function(path = ".") {
   cat("\n")
   cli::cli_h3("3. Common issues")
   patterns <- list(
-    "setwd()" = "Avoid setwd() — use RStudio projects or here::here()",
+    "setwd()" = "Avoid setwd() --- use RStudio projects or here::here()",
     "rm(list = ls())" = "Avoid rm(list=ls()) in shared scripts",
-    "install.packages" = "Package installation in script — move to setup section",
-    "source\\(\"http" = "Sourcing from URLs — security risk",
+    "install.packages" = "Package installation in script --- move to setup section",
+    "source\\(\"http" = "Sourcing from URLs --- security risk",
     "1:length\\(x\\)" = "Use seq_along(x) instead of 1:length(x)",
     "sapply\\(.*, \\[" = "Use vapply() for type-safe extraction",
     "options\\(stringsAsFactors" = "Deprecated since R 4.0",
-    "attach\\(" = "Avoid attach() — use with() or direct referencing"
+    "attach\\(" = "Avoid attach() --- use with() or direct referencing"
   )
   found_any <- FALSE
   for (pat in names(patterns)) {
@@ -270,7 +270,7 @@ air_analyze <- function(data) {
 
   cat("\n")
   cli::cli_h2("AIR Data Analysis: {nm}")
-  cli::cli_text("{nrow(data)} rows × {ncol(data)} columns")
+  cli::cli_text("{nrow(data)} rows x {ncol(data)} columns")
   cat("\n")
 
   # Show structure summary
@@ -352,7 +352,7 @@ air_google <- function(query, open_browser = TRUE) {
 #' @export
 air_rstudio <- function(mode = c("pane", "source", "console")) {
   if (!requireNamespace("rstudioapi", quietly = TRUE)) {
-    cli::cli_alert_warning("RStudio API not available — are you in RStudio?")
+	    cli::cli_alert_warning("RStudio API not available -- are you in RStudio?")
     return(invisible(NULL))
   }
   mode <- match.arg(mode)
@@ -360,7 +360,7 @@ air_rstudio <- function(mode = c("pane", "source", "console")) {
   if (mode == "pane") {
     cli::cli_alert_info("Opening AIR cheat sheet in Viewer pane...")
     html <- paste0(
-      "<h2>AIR — AI for R</h2>",
+      "<h2>AIR --- AI for R</h2>",
       "<table><tr><th>Task</th><th>Command</th></tr>",
       "<tr><td>Setup AI</td><td><code>air_setup()</code></td></tr>",
       "<tr><td>Chat with AI</td><td><code>air_chat()</code></td></tr>",
@@ -395,44 +395,44 @@ air_rstudio <- function(mode = c("pane", "source", "console")) {
 #' @export
 air_help <- function() {
   cat("\n")
-  cli::cli_h1("AIR — AI for R")
+  cli::cli_h1("AIR --- AI for R")
   cli::cli_text("Your AI coding assistant for RStudio")
   cat("\n")
 
-  cli::cli_h3("🚀 Getting Started")
-  cli::cli_bullets(c(
-    "*" = "{.code air_setup()} — Guided first-time setup (2 min)",
-    "*" = "{.code air_info()} — Show current configuration",
-    "*" = "{.code air_check()} — Test AI backend connectivity"
-  ))
+	  cli::cli_h3("[Setup] Getting Started")
+	  cli::cli_bullets(c(
+	    "*" = "{.code air_setup()} --- Guided first-time setup (2 min)",
+	    "*" = "{.code air_info()} --- Show current configuration",
+	    "*" = "{.code air_check()} --- Test AI backend connectivity"
+	  ))
 
-  cli::cli_h3("💬 AI Assistance")
-  cli::cli_bullets(c(
-    "*" = "{.code air_chat()} — Interactive chat with AI",
-    "*" = "{.code air_send('question')} — Send one message to AI",
-    "*" = "{.code air_google('topic')} — Search Google from R"
-  ))
+	  cli::cli_h3("[Chat] AI Assistance")
+	  cli::cli_bullets(c(
+	    "*" = "{.code air_chat()} --- Interactive chat with AI",
+	    "*" = "{.code air_send('question')} --- Send one message to AI",
+	    "*" = "{.code air_google('topic')} --- Search Google from R"
+	  ))
 
-  cli::cli_h3("📝 Code Development")
-  cli::cli_bullets(c(
-    "*" = "{.code air_explain('code')} — Explain what R code does",
-    "*" = "{.code air_generate('task')} — Generate R code from description",
-    "*" = "{.code air_debug()} — Debug your last R error",
-    "*" = "{.code air_document('fn')} — Generate roxygen2 documentation"
-  ))
+	  cli::cli_h3("[Code] Code Development")
+	  cli::cli_bullets(c(
+	    "*" = "{.code air_explain('code')} --- Explain what R code does",
+	    "*" = "{.code air_generate('task')} --- Generate R code from description",
+	    "*" = "{.code air_debug()} --- Debug your last R error",
+	    "*" = "{.code air_document('fn')} --- Generate roxygen2 documentation"
+	  ))
 
-  cli::cli_h3("📊 Data & Project Tools")
-  cli::cli_bullets(c(
-    "*" = "{.code air_analyze(mtcars)} — Guided data analysis",
-    "*" = "{.code air_search('topic')} — Find CRAN packages",
-    "*" = "{.code air_diagnose('script.R')} — Diagnose script issues"
-  ))
+	  cli::cli_h3("[Data] Data & Project Tools")
+	  cli::cli_bullets(c(
+	    "*" = "{.code air_analyze(mtcars)} --- Guided data analysis",
+	    "*" = "{.code air_search('topic')} --- Find CRAN packages",
+	    "*" = "{.code air_diagnose('script.R')} --- Diagnose script issues"
+	  ))
 
-  cli::cli_h3("⚙️ Configuration")
-  cli::cli_bullets(c(
-    "*" = "{.code air_configure(backend = 'ollama')} — Switch AI backend",
-    "*" = "Supported backends: ollama, openai, claude, deepseek, kimi, zai"
-  ))
+		  cli::cli_h3("[Config] Configuration")
+		  cli::cli_bullets(c(
+		    "*" = "{.code air_configure(provider = 'ollama')} --- Switch AI provider",
+		    "*" = "13+ providers: ollama, openai, claude, groq, mistral, deepseek, kimi, zai, perplexity, together, lmstudio, vllm, openrouter --- or any custom endpoint"
+		  ))
 
   cat("\n")
   cli::cli_text("Run {.code air_setup()} for a guided walkthrough!")

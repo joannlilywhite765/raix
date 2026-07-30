@@ -7,14 +7,14 @@ steps <- 0; fails <- 0
 
 # ── Setup ──
 cat("1. air_setup (non-interactive): ")
-air_configure(backend = "ollama", model = "llama3.2"); cat("OK\n"); steps <- steps + 1
+air_configure(provider = "ollama", model = "llama3.2"); cat("OK\n"); steps <- steps + 1
 
 cat("2. air_help: "); air_help(); steps <- steps + 1
 
 cat("3. air_info: "); air_info(); steps <- steps + 1
 
 cat("4. air_check (dead port): ")
-r <- tryCatch({air_configure(backend="ollama", base_url="http://127.0.0.1:1"); air_check()}, error = function(e) "CAUGHT")
+r <- tryCatch({air_configure(provider="ollama", base_url="http://127.0.0.1:1"); air_check()}, error = function(e) "CAUGHT")
 cat(if (inherits(r, "logical")) "OK" else "CAUGHT", "\n"); steps <- steps + 1
 
 # ── Code tools ──
@@ -66,7 +66,7 @@ if (all_ok) { cat("OK (all 6 rejected)\n"); steps <- steps + 1 } else { cat("FAI
 # ── Stress test ──
 cat("14. Rapid function switching: ")
 for (i in 1:5) {
-  tryCatch(air_configure(backend = sample(c("openai","ollama","claude","deepseek"), 1)), error = function(e) NULL)
+  tryCatch(air_configure(provider = sample(c("openai","ollama","claude","deepseek"), 1)), error = function(e) NULL)
   tryCatch(air_info(), error = function(e) NULL)
   tryCatch(air_help(), error = function(e) NULL)
 }

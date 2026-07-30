@@ -12,14 +12,13 @@ Description: Bring AI-powered coding assistance directly into your R workflow.
     and create R code from natural language — all without leaving RStudio.
     Works with any OpenAI-compatible API, Ollama, or Anthropic Claude.
 License: MIT + file LICENSE
-URL: https://github.com/twomathematicians-code/air
-BugReports: https://github.com/twomathematicians-code/air/issues
+URL: https://github.com/twomathematicians-code/raix
+BugReports: https://github.com/twomathematicians-code/raix/issues
 Encoding: UTF-8
 Imports:
     httr,
     jsonlite,
     cli,
-    rlang,
     utils
 Suggests:
     testthat (>= 3.0.0),

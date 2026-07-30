@@ -17,3 +17,6 @@ export(air_google)
 export(air_rstudio)
 export(air_help)
 export(air_gui)
+
+importFrom(utils, available.packages, browseURL, capture.output,
+           head, installed.packages, URLencode)

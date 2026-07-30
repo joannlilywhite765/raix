@@ -1,9 +1,9 @@
-# AIR Backend Handlers — 3 API formats cover ALL providers
+# AIR Backend Handlers --- 3 API formats cover ALL providers
 #
-# air_openai_compatible() — GPT-4o, Groq, Together, Mistral, DeepSeek, Kimi,
+# air_openai_compatible() --- GPT-4o, Groq, Together, Mistral, DeepSeek, Kimi,
 #   Z.Ai, Perplexity, LM Studio, vLLM, OpenRouter, any custom endpoint
-# air_ollama_native()     — Ollama local API format
-# air_claude_native()     — Anthropic Claude Messages API
+# air_ollama_native()     --- Ollama local API format
+# air_claude_native()     --- Anthropic Claude Messages API
 
 # ── OpenAI-compatible (covers 90% of all providers) ─────────────────────────
 air_openai_compatible <- function(messages, stream = FALSE) {
@@ -94,4 +94,4 @@ air_check <- function() {
   invisible(ok)
 }
 
-`%||%` <- function(a, b) if (is.null(a)) b else a
+# `%||%` is defined in air.R --- see top of that file

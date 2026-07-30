@@ -4,3 +4,5 @@
 .Ruserdata
 *.o
 *.so
+create_man.R
+create_demo_gif.py

@@ -1,7 +1,7 @@
-# AIR — AI for R: Core API Client
+# AIR --- AI for R: Core API Client
 #
 # Model-agnostic: works with ANY OpenAI-compatible, Ollama, or Claude API.
-# No hardcoded provider list — bring your own model, your own endpoint.
+# No hardcoded provider list --- bring your own model, your own endpoint.
 
 #' @keywords internal
 "_PACKAGE"
@@ -40,7 +40,7 @@ PROVIDER_PRESETS <- list(
   openrouter = list(base_url = "https://openrouter.ai/api/v1", api_format = "openai")
 )
 
-#' Configure AIR — works with ANY model, ANY endpoint
+#' Configure AIR --- works with ANY model, ANY endpoint
 #'
 #' Bring your own model. AIR auto-detects API format from the URL or
 #' provider name. Use a known preset (ollama, openai, groq, mistral, etc.)
@@ -48,7 +48,7 @@ PROVIDER_PRESETS <- list(
 #'
 #' @param provider Display name or preset: "ollama","openai","claude","groq",
 #'   "together","mistral","perplexity","lmstudio","vllm","deepseek","kimi","zai",
-#'   "openrouter" — or any custom name.
+#'   "openrouter" --- or any custom name.
 #' @param model Any model name (e.g., "gpt-4o","llama3.2","claude-3-opus",
 #'   "mixtral-8x7b","gemma2:9b","custom-model")
 #' @param api_key API key (not needed for local models)
@@ -218,7 +218,7 @@ air_generate <- function(description, context = NULL) {
 
 #' @export
 air_chat <- function() {
-  cli::cli_h1("AIR Chat — {air_env$provider} / {air_env$model}")
+  cli::cli_h1("AIR Chat --- {air_env$provider} / {air_env$model}")
   cli::cli_text("Type 'exit' or press ESC to end.")
   while (TRUE) {
     user_input <- readline(cli::col_blue("\nYou> "))
