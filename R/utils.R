@@ -77,16 +77,22 @@ raix_setup <- function(auto = TRUE, provider = NULL, model = NULL, api_key = NUL
     raix_configure(provider = choice, model = model_name, base_url = url,
                    api_key = if (nchar(trimws(key)) > 0) key else NULL,
                    api_format = fmt)
-  } else if (choice == "ollama") {
-    cli::cli_h3("Ollama setup")
-    model_name <- readline(cli::col_blue("Model [llama3.2]: "))
-    if (nchar(trimws(model_name)) == 0) model_name <- "llama3.2"
-    raix_configure(provider = "ollama", model = model_name)
-  } else {
-    cli::cli_h3("API key")
-    key <- readline(cli::col_blue("API key: "))
-    model_name <- readline(cli::col_blue("Model (enter for default): "))
-    if (nchar(trimws(model_name)) == 0) model_name <- NULL
+	  } else if (choice == "ollama") {
+	    cli::cli_h3("Ollama setup")
+	    model_name <- readline(cli::col_blue("Model [llama3.2]: "))
+	    if (nchar(trimws(model_name)) == 0 || tolower(trimws(model_name)) %in% c("yes", "y", "default", "ok", "yeah", "yep")) {
+	      model_name <- "llama3.2"
+	      cli::cli_alert_info("Using default: {model_name}")
+	    }
+	    raix_configure(provider = "ollama", model = model_name)
+	  } else {
+	    cli::cli_h3("API key")
+	    key <- readline(cli::col_blue("API key: "))
+	    model_name <- readline(cli::col_blue("Model (enter for default): "))
+	    if (nchar(trimws(model_name)) == 0 || tolower(trimws(model_name)) %in% c("yes", "y", "default", "ok", "yeah", "yep")) {
+	      model_name <- NULL
+	      cli::cli_alert_info("Using provider default model")
+	    }
     raix_configure(provider = choice, api_key = key, model = model_name)
   }
   

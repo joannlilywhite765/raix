@@ -43,8 +43,8 @@ raix_claude_native <- function(messages, stream = FALSE) {
 
 # ── Core API call ───────────────────────────────────────────────────────────
 raix_api_call <- function(url, headers, body, field = "choices.0.message.content") {
-  resp <- try(httr::POST(url, headers, body = jsonlite::toJSON(body, auto_unbox = TRUE),
-    encode = "raw", httr::timeout(30)), silent = TRUE)
+	  resp <- try(httr::POST(url, headers, body = jsonlite::toJSON(body, auto_unbox = TRUE),
+	    encode = "raw", httr::timeout(120)), silent = TRUE)
   if (inherits(resp, "try-error")) {
 	    cli::cli_abort(c("raix: cannot reach {raix_env$provider}",
       "i" = "URL: {url}", "x" = "{trimws(as.character(resp))}"))
