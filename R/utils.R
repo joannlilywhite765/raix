@@ -530,6 +530,18 @@ raix_help <- function() {
     "*" = "{.code raix_write('desc', 'out.R')} --- Write AI content to file"
   ))
 
+  cli::cli_h3("[Compute] Terminal, Python, Compile, Pipeline")
+  cli::cli_bullets(c(
+    "*" = "{.code raix_terminal('ls -la')} --- Run shell commands + AI analysis",
+    "*" = "{.code raix_python('task')} --- Generate and run Python from R",
+    "*" = "{.code raix_compile('task')} --- Generate C++ with Rcpp, compile, return function",
+    "*" = "{.code raix_pipeline(steps)} --- Multi-step cross-language workflow",
+    "*" = "{.code raix_benchmark(expr)} --- Time code, get AI optimization tips",
+    "*" = "{.code raix_parallel('task')} --- AI rewrites code for multi-core",
+    "*" = "{.code raix_sysinfo()} --- Show CPU/RAM/GPU/Python info for AI context",
+    "*" = "{.code raix_run('script.py')} --- Run any script (R, Python, shell, JS)"
+  ))
+
   cli::cli_h3("[Config] Configuration")
 		  cli::cli_bullets(c(
 		    "*" = "{.code raix_configure(provider = 'ollama')} --- Switch AI provider",

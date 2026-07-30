@@ -61,6 +61,8 @@ raix_solve("Analyze mtcars: find what predicts mpg, with plots")
 - **Beginner-friendly.** `raix_setup()` auto-detects your setup — one command, zero configuration.
 - **Small-model optimized.** Auto-detects 7B-9B models (qwen2.5-coder, phi3.5, gemma2, llama3.2) and switches to concise, directive prompts that work reliably on local hardware.
 - **Developer agent.** `raix_solve("problem")` generates complete R solutions. `raix_script()` and `raix_notebook()` create .R and .Rmd files. `raix_project()` scans your directory for full context.
+- **Compute engine.** `raix_terminal()` runs shell commands with AI interpretation. `raix_python()` generates and runs Python from R. `raix_compile()` writes C++ with Rcpp and compiles it. `raix_pipeline()` designs multi-step cross-language workflows.
+- **Performance tools.** `raix_benchmark()` times your code and suggests optimizations. `raix_parallel()` rewrites your code for multi-core execution.
 - **Privacy-first.** Ollama runs entirely locally — your code never leaves your machine.
 
 ---
@@ -148,6 +150,43 @@ All providers that expose an OpenAI-compatible `/v1/chat/completions` endpoint w
 ## Usage
 
 ### Console Chat
+
+```r
+library(raix)
+raix_configure(provider = "ollama", model = "llama3.2")
+raix_chat()
+```
+
+### Compute & Cross-Language
+
+```r
+# Run shell commands with AI interpretation
+raix_terminal("ls -la data/ | wc -l")
+raix_terminal("docker ps", explain = TRUE)
+
+# Generate + execute Python from R
+raix_python("Scrape this URL and return a pandas DataFrame")
+
+# Design a multi-step pipeline
+raix_pipeline(c(
+  "Load CSV data",
+  "Clean and normalize with R",
+  "Train XGBoost in Python",
+  "Plot results back in R with ggplot2"
+), output = "pipeline.R", execute = TRUE)
+
+# Generate C++ for heavy compute, compile, call from R
+raix_compile("Matrix multiplication optimized for large sparse matrices")
+
+# Benchmark and optimize
+raix_benchmark({ my_slow_function(large_data) })
+
+# Auto-parallelize
+raix_parallel("Apply a GLM to each of 1000 data subsets")
+
+# Full system context for the AI
+raix_sysinfo()
+```
 
 ```r
 library(raix)
