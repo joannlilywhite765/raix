@@ -27,8 +27,9 @@ raix_env$model      <- "llama3.2"     # Any model name
 raix_env$api_key    <- NULL
 raix_env$base_url   <- "http://localhost:11434"
 raix_env$api_format <- "ollama"       # "openai", "ollama", or "claude"
+raix_env$small_model <- FALSE         # Auto-detected, can be overridden
 raix_env$system_prompt <- paste0(
-	  "You are raix, an AI coding assistant for R. ",
+  "You are raix, an AI coding assistant for R. ",
   "You help users write, explain, debug, and document R code. ",
   "Always respond with valid R code when asked to generate code. ",
   "Keep explanations concise and R-focused."
@@ -36,6 +37,81 @@ raix_env$system_prompt <- paste0(
 raix_env$temperature  <- 0.2
 raix_env$max_tokens   <- 2048
 raix_env$chat_history <- list()
+
+# Small-model optimized system prompt
+SMALL_SYSTEM_PROMPT <- paste0(
+  "You are an R coding assistant. Reply with ONLY what is asked. ",
+  "For code: output ONLY the R code, no explanation. ",
+  "For explanations: 2-3 bullet points max. ",
+  "For debugging: state the cause in 1 line, then the fix. ",
+  "Be direct. Be brief. Use base R when possible."
+)
+
+# Detect if a model is "small" (< ~10B params) based on naming patterns
+raix_detect_model_size <- function(model_name) {
+  if (is.null(model_name) || nchar(model_name) == 0) return(FALSE)
+  m <- tolower(model_name)
+  # Known small model patterns
+  small_patterns <- c(
+    "7b", "8b", "9b", "3b", "1b", "3.8b",
+    "phi", "llama3.2", "llama3.1:8b",
+    "gemma2:2b", "gemma2:9b",
+    "qwen2.5:7b", "qwen2.5:3b", "qwen2:7b", "qwen2:1.5b",
+    "mistral:7b", "mistral-nemo",
+    "codellama:7b", "deepseek-coder:1.3b", "deepseek-coder:6.7b",
+    "tinyllama", "smollm", "orca-mini", "dolphin-mistral",
+    "nomic-embed-text"  # embedding model, not for chat
+  )
+  any(sapply(small_patterns, function(p) grepl(p, m, fixed = TRUE)))
+}
+
+# Apply small-model optimizations
+raix_optimize_for_model <- function(model_name) {
+  is_small <- raix_detect_model_size(model_name)
+  raix_env$small_model <- is_small
+  if (is_small) {
+    raix_env$system_prompt <- SMALL_SYSTEM_PROMPT
+    if (raix_env$temperature < 0.3) raix_env$temperature <- 0.3
+    raix_env$max_tokens <- min(raix_env$max_tokens, 1024)
+  } else {
+    raix_env$system_prompt <- paste0(
+      "You are raix, an AI coding assistant for R. ",
+      "You help users write, explain, debug, and document R code. ",
+      "Always respond with valid R code when asked to generate code. ",
+      "Keep explanations concise and R-focused."
+    )
+  }
+  invisible(is_small)
+}
+
+#' Toggle small-model optimization mode
+#'
+#' Forces small-model optimized prompts on/off. Auto-detected by default
+#' based on model name (7B, 9B, phi, etc.). Small mode uses shorter, more
+#' directive prompts that work better with local models.
+#'
+#' @param enable TRUE to force small-model mode, FALSE for standard, NULL to auto-detect
+#' @return Invisibly returns TRUE if small mode is active
+#' @export
+raix_small_mode <- function(enable = NULL) {
+  if (!is.null(enable)) {
+    raix_env$small_model <- isTRUE(enable)
+    if (raix_env$small_model) {
+      raix_env$system_prompt <- SMALL_SYSTEM_PROMPT
+      if (raix_env$temperature < 0.3) raix_env$temperature <- 0.3
+      cli::cli_alert_info("Small-model mode ON --- optimized prompts for local models")
+    } else {
+      raix_env$system_prompt <- paste0(
+        "You are raix, an AI coding assistant for R. ",
+        "You help users write, explain, debug, and document R code. ",
+        "Always respond with valid R code when asked to generate code. ",
+        "Keep explanations concise and R-focused."
+      )
+      cli::cli_alert_info("Small-model mode OFF --- standard prompts")
+    }
+  }
+  invisible(raix_env$small_model)
+}
 
 # Known provider presets (for convenience, not a hardcoded list) -------------
 PROVIDER_PRESETS <- list(
@@ -136,10 +212,13 @@ raix_configure <- function(provider = NULL, model = NULL, api_key = NULL,
                   groq = "mixtral-8x7b-32768", together = "mistralai/Mixtral-8x7B-Instruct-v0.1",
                   mistral = "mistral-large-latest", perplexity = "sonar-pro",
                   deepseek = "deepseek-chat", kimi = "moonshot-v1-8k")
-    if (p %in% names(defaults)) raix_env$model <- defaults[[p]]
-  }
-
-  cli::cli_alert_success("raix configured: {raix_env$provider} / {raix_env$model} [{raix_env$api_format}]")
+	  if (p %in% names(defaults)) raix_env$model <- defaults[[p]]
+	  }
+	
+	  # Auto-detect and optimize for small models
+	  is_small <- raix_optimize_for_model(raix_env$model)
+	
+	  cli::cli_alert_success("raix configured: {raix_env$provider} / {raix_env$model} [{raix_env$api_format}]{if(is_small) ' [small-model optimized]' else ''}")
   invisible(as.list(raix_env))
 }
 
@@ -188,7 +267,7 @@ raix_send <- function(prompt, context = NULL, stream = FALSE) {
   resp
 }
 
-# ── User-facing helpers (unchanged) ────────────────────────────────────────
+# ── User-facing helpers ──────────────────────────────────────────────────────
 
 #' @export
 raix_explain <- function(code) {
@@ -196,7 +275,12 @@ raix_explain <- function(code) {
     stop("code must be a non-empty character string (an R expression or function name)")
   }
   if (exists(code, mode = "function")) code <- paste(deparse(get(code)), collapse = "\n")
-  raix_send(paste0("Explain this R code in simple terms:\n\n```r\n", code, "\n```"))
+  if (raix_env$small_model) {
+    prompt <- paste0("Explain this R code in 2-3 bullet points:\n\n", code)
+  } else {
+    prompt <- paste0("Explain this R code in simple terms:\n\n```r\n", code, "\n```")
+  }
+  raix_send(prompt)
 }
 
 #' @export
@@ -206,10 +290,14 @@ raix_debug <- function(error_msg = NULL) {
     if (is.null(error_msg) || nchar(error_msg) == 0)
       stop("No error to debug. Provide error_msg or run raix_debug() immediately after an error.")
   }
-  trace <- tryCatch(paste(utils::capture.output(traceback()), collapse = "\n"), error = function(e) "")
-  prompt <- paste0("I got this R error:\n\n", error_msg, "\n\n",
-    if (nchar(trace) > 0) paste0("Traceback:\n", trace, "\n\n") else "",
-    "Explain the root cause and suggest a fix.")
+  if (raix_env$small_model) {
+    prompt <- paste0("R error: ", error_msg, "\nCause (1 line):\nFix (R code):")
+  } else {
+    trace <- tryCatch(paste(utils::capture.output(traceback()), collapse = "\n"), error = function(e) "")
+    prompt <- paste0("I got this R error:\n\n", error_msg, "\n\n",
+      if (nchar(trace) > 0) paste0("Traceback:\n", trace, "\n\n") else "",
+      "Explain the root cause and suggest a fix.")
+  }
   raix_send(prompt)
 }
 
@@ -218,7 +306,12 @@ raix_document <- function(code, func_name = NULL) {
   if (missing(code) || is.null(code) || is.na(code) || !is.character(code) || nchar(trimws(code)) == 0) {
     stop("code must be a non-empty character string containing an R function")
   }
-  raix_send(paste0("Generate roxygen2 documentation for this R function:\n\n```r\n", code, "\n```\n\nOutput ONLY the roxygen block."))
+  if (raix_env$small_model) {
+    prompt <- paste0("Generate roxygen2 docs for this function. Output ONLY the comment block:\n\n", code)
+  } else {
+    prompt <- paste0("Generate roxygen2 documentation for this R function:\n\n```r\n", code, "\n```\n\nOutput ONLY the roxygen block.")
+  }
+  raix_send(prompt)
 }
 
 #' @export
@@ -227,7 +320,12 @@ raix_generate <- function(description, context = NULL) {
       !is.character(description) || nchar(trimws(description)) == 0) {
     stop("description must be a non-empty character string")
   }
-  raix_send(paste0("Write R code for: ", description, ". Output ONLY the R code."), context = context)
+  if (raix_env$small_model) {
+    prompt <- paste0("Write R code. Output code only, no explanation.\nTask: ", description)
+  } else {
+    prompt <- paste0("Write R code for: ", description, ". Output ONLY the R code.")
+  }
+  raix_send(prompt, context = context)
 }
 
 #' @export

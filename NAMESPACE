@@ -17,6 +17,7 @@ export(raix_google)
 export(raix_rstudio)
 export(raix_help)
 export(raix_gui)
+export(raix_small_mode)
 
 importFrom(utils, available.packages, browseURL, capture.output,
            head, installed.packages, URLencode)

@@ -2,10 +2,11 @@
 
 <!-- badges: start -->
 [![R CMD Check](https://github.com/twomathematicians-code/raix/actions/workflows/ci.yml/badge.svg)](https://github.com/twomathematicians-code/raix/actions)
-[![Version](https://img.shields.io/badge/version-0.4.1-blue)](https://github.com/twomathematicians-code/raix)
+[![Version](https://img.shields.io/badge/version-0.5.0-blue)](https://github.com/twomathematicians-code/raix)
 [![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
 [![R 4.0+](https://img.shields.io/badge/R-%E2%89%A5%204.0-276DC3?logo=r)](https://www.r-project.org/)
 [![Providers](https://img.shields.io/badge/providers-13%2B-6366f1)](https://github.com/twomathematicians-code/raix#-supported-providers)
+[![Small LLM](https://img.shields.io/badge/small_LLM-optimized-22c55e)](https://github.com/twomathematicians-code/raix#-small-model-optimization)
 <!-- badges: end -->
 
 <p align="center">
@@ -56,8 +57,35 @@ raix_chat()
 - **Data analysis assistant.** `raix_analyze(mtcars)` — get AI-suggested analyses for any data.frame.
 - **Script diagnosis.** `raix_diagnose("my_script.R")` — scan for missing packages, syntax errors, and anti-patterns.
 - **Google search.** `raix_google("R tidyverse tutorial")` — search the web from R with AI summary.
-- **Beginner-friendly.** `raix_setup()` walks first-time users through everything in under 2 minutes.
+- **Beginner-friendly.** `raix_setup()` auto-detects your setup — one command, zero configuration.
+- **Small-model optimized.** Auto-detects 7B-9B models (qwen2.5-coder, phi3.5, gemma2, llama3.2) and switches to concise, directive prompts that work reliably on local hardware.
 - **Privacy-first.** Ollama runs entirely locally — your code never leaves your machine.
+
+---
+
+## Small-Model Optimization
+
+raix automatically detects when you're using a small local model (7B-9B parameters) and optimizes prompts for reliable results:
+
+| Aspect | Standard Mode | Small-Model Mode |
+|:-------|:-------------|:-----------------|
+| System prompt | Verbose, helpful | Direct, instruction-focused |
+| Code generation | Code + brief explanation | Code only, no explanation |
+| Explanations | Detailed paragraphs | 2-3 bullet points |
+| Debugging | Full diagnosis | Cause + fix in 2 lines |
+| Temperature | 0.2 | 0.3 (better for small models) |
+| Max tokens | 2048 | 1024 |
+
+```r
+# Auto-detected (default) — raix detects qwen2.5-coder:7b, phi3.5, gemma2:9b, etc.
+raix_configure(provider = "ollama", model = "qwen2.5-coder:7b")
+# ✔ raix configured: ollama / qwen2.5-coder:7b [ollama] [small-model optimized]
+
+# Manual control
+raix_small_mode(TRUE)   # Force small-model prompts
+raix_small_mode(FALSE)  # Force standard prompts
+raix_small_mode()       # Check current mode
+```
 
 ---
 
