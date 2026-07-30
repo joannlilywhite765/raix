@@ -2,7 +2,8 @@
 
 <!-- badges: start -->
 [![R CMD Check](https://github.com/twomathematicians-code/raix/actions/workflows/ci.yml/badge.svg)](https://github.com/twomathematicians-code/raix/actions)
-[![Version](https://img.shields.io/badge/version-0.5.0-blue)](https://github.com/twomathematicians-code/raix)
+[![Version](https://img.shields.io/badge/version-0.5.0-blue)](https://github.com/twomathematicians-code/raix/releases)
+[![Release](https://img.shields.io/github/v/release/twomathematicians-code/raix)](https://github.com/twomathematicians-code/raix/releases)
 [![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
 [![R 4.0+](https://img.shields.io/badge/R-%E2%89%A5%204.0-276DC3?logo=r)](https://www.r-project.org/)
 [![Providers](https://img.shields.io/badge/providers-13%2B-6366f1)](https://github.com/twomathematicians-code/raix#-supported-providers)
