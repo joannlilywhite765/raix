@@ -17,44 +17,51 @@
 air_setup <- function() {
   cli::cli_h1("Welcome to AIR — AI for R!")
   cli::cli_text("")
-  cli::cli_text("This wizard will help you set up AIR in under 2 minutes.")
+  cli::cli_text("This wizard helps you connect to ANY AI model in under 2 minutes.")
   cli::cli_text("")
 
-  # Step 1: Choose backend
-  cli::cli_h3("Step 1: Choose your AI backend")
+  # Step 1: Choose provider
+  cli::cli_h3("Step 1: Choose your AI provider")
   cli::cli_bullets(c(
-    "*" = "Ollama — FREE, runs on your computer, 100% private (recommended for beginners)",
-    "*" = "OpenAI — GPT-4o, most capable, requires API key ($)",
-    "*" = "Claude — Anthropic, great for reasoning, requires API key ($)",
-    "*" = "DeepSeek — Affordable, strong at code generation, requires API key ($)",
-    "*" = "Kimi / Z.Ai — Alternative providers"
+    "*" = "Ollama — FREE, local, private (recommended for beginners)",
+    "*" = "OpenAI — GPT-4o, most capable, requires API key",
+    "*" = "Claude — Anthropic, great for reasoning",
+    "*" = "Groq — Fast, free tier available",
+    "*" = "Together AI — Many open-source models",
+    "*" = "Mistral — European AI provider",
+    "*" = "DeepSeek — Affordable code generation",
+    "*" = "LM Studio / vLLM — Local OpenAI-compatible servers",
+    "*" = "custom — ANY OpenAI-compatible endpoint (bring your own URL)"
   ))
   cat("\n")
-  choice <- readline(cli::col_blue("Which backend? [ollama/openai/claude/deepseek/kimi/zai]: "))
+  choice <- readline(cli::col_blue("Provider [ollama/openai/claude/groq/together/mistral/deepseek/lmstudio/vllm/custom]: "))
   choice <- tolower(trimws(choice))
-  if (!choice %in% c("ollama","openai","claude","deepseek","kimi","zai")) {
-    cli::cli_alert_warning("Invalid choice. Defaulting to Ollama (free, local).")
-    choice <- "ollama"
-  }
+  if (nchar(choice) == 0) choice <- "ollama"
 
   # Step 2: Configure
-  if (choice == "ollama") {
+  if (choice == "custom") {
+    cli::cli_h3("Step 2: Custom endpoint")
+    url <- readline(cli::col_blue("API base URL (e.g., https://api.example.com/v1): "))
+    model <- readline(cli::col_blue("Model name: "))
+    key <- readline(cli::col_blue("API key (enter to skip): "))
+    api_fmt <- readline(cli::col_blue("API format [openai/ollama/claude] (default: openai): "))
+    if (nchar(trimws(api_fmt)) == 0) api_fmt <- "openai"
+    air_configure(provider = choice, model = model, base_url = url,
+                  api_key = if (nchar(trimws(key)) > 0) key else NULL,
+                  api_format = api_fmt)
+  } else if (choice == "ollama") {
     cli::cli_h3("Step 2: Ollama setup")
-    cli::cli_text("Ollama runs AI models locally on your computer.")
-    cli::cli_text("If you haven't installed it yet: visit {.url https://ollama.com}")
-    model <- readline(cli::col_blue("Model name [llama3.2]: "))
+    cli::cli_text("Ollama runs AI locally. Install from {.url https://ollama.com}")
+    model <- readline(cli::col_blue("Model [llama3.2]: "))
     if (nchar(trimws(model)) == 0) model <- "llama3.2"
-    air_configure(backend = "ollama", model = model)
+    air_configure(provider = "ollama", model = model)
   } else {
     cli::cli_h3("Step 2: API key")
-    cli::cli_text("You need an API key from {choice}.")
-    key <- readline(cli::col_blue("Paste your API key: "))
-    if (nchar(trimws(key)) < 5) {
-      cli::cli_alert_danger("No valid key provided. AIR will work but cannot call the API.")
-    } else {
-      air_configure(backend = choice, api_key = key)
-      cli::cli_alert_success("API key saved for this session.")
-    }
+    cli::cli_text("Get an API key from {choice}.")
+    key <- readline(cli::col_blue("API key: "))
+    model <- readline(cli::col_blue("Model name (enter for default): "))
+    if (nchar(trimws(model)) == 0) model <- NULL
+    air_configure(provider = choice, api_key = key, model = model)
   }
 
   # Step 3: Test connectivity
