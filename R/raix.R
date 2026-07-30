@@ -1,10 +1,24 @@
-# raix --- AI for R: Core API Client
+# raix --- R + AI + eXperiment: Core API Client
 #
 # Model-agnostic: works with ANY OpenAI-compatible, Ollama, or Claude API.
 # No hardcoded provider list --- bring your own model, your own endpoint.
 
 #' @keywords internal
 "_PACKAGE"
+
+# Startup message on library(raix)
+.onAttach <- function(libname, pkgname) {
+  configured <- !is.null(raix_env$api_key) || 
+    (raix_env$provider == "ollama" && raix_env$base_url == "http://localhost:11434")
+  
+  if (!configured || length(raix_env$chat_history) == 0) {
+    packageStartupMessage(
+      "raix = R + AI + eXperiment\n",
+      "Run raix_setup() to configure in under 2 minutes.",
+      if (!configured) " Or raix_gui() to open the chat window." else ""
+    )
+  }
+}
 
 # Global state ---------------------------------------------------------------
 raix_env <- new.env(parent = emptyenv())

@@ -8,88 +8,167 @@
 # raix_rstudio()  --- RStudio integration helper
 # raix_help()     --- beginner-friendly help menu
 
-#' Guided first-time setup wizard
+#' Single-command setup --- auto-detects and configures everything
 #'
-#' Walks new users through backend selection, API key configuration,
-#' connectivity testing, and a quick tutorial. Designed for complete beginners.
+#' Auto-detects running AI backends (Ollama, LM Studio, vLLM), checks
+#' environment variables for API keys (OPENAI_API_KEY, ANTHROPIC_API_KEY,
+#' GROQ_API_KEY, etc.), and falls back to an interactive wizard if needed.
+#' One command to get everything working.
 #'
+#' @param auto If TRUE (default), attempts auto-detection before asking.
+#' @param provider Force a specific provider (skips auto-detection).
+#' @param model Force a specific model.
+#' @param api_key Force a specific API key.
 #' @export
-raix_setup <- function() {
-  cli::cli_h1("Welcome to raix --- AI for R!")
-  cli::cli_text("")
-  cli::cli_text("This wizard helps you connect to ANY AI model in under 2 minutes.")
-  cli::cli_text("")
-
-  # Step 1: Choose provider
-  cli::cli_h3("Step 1: Choose your AI provider")
+raix_setup <- function(auto = TRUE, provider = NULL, model = NULL, api_key = NULL) {
+  cli::cli_h1("raix = R + AI + eXperiment")
+  
+  # Fast path: user provided everything
+  if (!is.null(provider)) {
+    raix_configure(provider = provider, model = model, api_key = api_key)
+    if (isTRUE(raix_check_silent())) {
+      cli::cli_alert_success("Connected! raix_chat() to start chatting.")
+      return(invisible(raix_info()))
+    }
+  }
+  
+  # Auto-detection
+  if (auto) {
+    cli::cli_h3("Auto-detecting AI backends...")
+    detected <- raix_autodetect()
+    if (!is.null(detected)) {
+      cli::cli_alert_success("Auto-configured: {detected$provider} / {detected$model}")
+      raix_configure(provider = detected$provider, model = detected$model,
+                     api_key = detected$api_key)
+      if (isTRUE(raix_check_silent())) {
+        cli::cli_alert_success("Connected! Type {.code raix_chat()} to start chatting.")
+        cli::cli_bullets(c(
+          "*" = "{.code raix_explain('mean')} --- Explain R code",
+          "*" = "{.code raix_generate('bar chart')} --- Generate R code",
+          "*" = "{.code raix_chat()} --- Interactive chat",
+          "*" = "{.code raix_gui()} --- Chat window in RStudio Viewer",
+          "*" = "{.code raix_help()} --- All commands"
+        ))
+        return(invisible(raix_info()))
+      }
+      cli::cli_alert_info("Backend detected but not reachable. Trying interactive setup...")
+    } else {
+      cli::cli_alert_info("No running AI backends auto-detected.")
+    }
+  }
+  
+  # Interactive wizard fallback
+  cat("\n")
+  cli::cli_h3("Choose your AI provider")
   cli::cli_bullets(c(
-    "*" = "Ollama --- FREE, local, private (recommended for beginners)",
-    "*" = "OpenAI --- GPT-4o, most capable, requires API key",
+    "*" = "Ollama --- FREE, local, private (recommended)",
+    "*" = "OpenAI --- GPT-4o, most capable, needs API key",
     "*" = "Claude --- Anthropic, great for reasoning",
     "*" = "Groq --- Fast, free tier available",
-    "*" = "Together AI --- Many open-source models",
-    "*" = "Mistral --- European AI provider",
-    "*" = "DeepSeek --- Affordable code generation",
-    "*" = "LM Studio / vLLM --- Local OpenAI-compatible servers",
-    "*" = "custom --- ANY OpenAI-compatible endpoint (bring your own URL)"
+    "*" = "Mistral / DeepSeek / Together / LM Studio / vLLM / custom"
   ))
   cat("\n")
-  choice <- readline(cli::col_blue("Provider [ollama/openai/claude/groq/together/mistral/deepseek/lmstudio/vllm/custom]: "))
+  choice <- readline(cli::col_blue("Provider [ollama]: "))
   choice <- tolower(trimws(choice))
   if (nchar(choice) == 0) choice <- "ollama"
 
-  # Step 2: Configure
   if (choice == "custom") {
-    cli::cli_h3("Step 2: Custom endpoint")
-    url <- readline(cli::col_blue("API base URL (e.g., https://api.example.com/v1): "))
-    model <- readline(cli::col_blue("Model name: "))
+    cli::cli_h3("Custom endpoint")
+    url <- readline(cli::col_blue("API base URL: "))
+    model_name <- readline(cli::col_blue("Model name: "))
     key <- readline(cli::col_blue("API key (enter to skip): "))
-    api_fmt <- readline(cli::col_blue("API format [openai/ollama/claude] (default: openai): "))
-    if (nchar(trimws(api_fmt)) == 0) api_fmt <- "openai"
-    raix_configure(provider = choice, model = model, base_url = url,
-                  api_key = if (nchar(trimws(key)) > 0) key else NULL,
-                  api_format = api_fmt)
+    fmt <- readline(cli::col_blue("API format [openai]: "))
+    if (nchar(trimws(fmt)) == 0) fmt <- "openai"
+    raix_configure(provider = choice, model = model_name, base_url = url,
+                   api_key = if (nchar(trimws(key)) > 0) key else NULL,
+                   api_format = fmt)
   } else if (choice == "ollama") {
-    cli::cli_h3("Step 2: Ollama setup")
-    cli::cli_text("Ollama runs AI locally. Install from {.url https://ollama.com}")
-    model <- readline(cli::col_blue("Model [llama3.2]: "))
-    if (nchar(trimws(model)) == 0) model <- "llama3.2"
-    raix_configure(provider = "ollama", model = model)
+    cli::cli_h3("Ollama setup")
+    model_name <- readline(cli::col_blue("Model [llama3.2]: "))
+    if (nchar(trimws(model_name)) == 0) model_name <- "llama3.2"
+    raix_configure(provider = "ollama", model = model_name)
   } else {
-    cli::cli_h3("Step 2: API key")
-    cli::cli_text("Get an API key from {choice}.")
+    cli::cli_h3("API key")
     key <- readline(cli::col_blue("API key: "))
-    model <- readline(cli::col_blue("Model name (enter for default): "))
-    if (nchar(trimws(model)) == 0) model <- NULL
-    raix_configure(provider = choice, api_key = key, model = model)
+    model_name <- readline(cli::col_blue("Model (enter for default): "))
+    if (nchar(trimws(model_name)) == 0) model_name <- NULL
+    raix_configure(provider = choice, api_key = key, model = model_name)
   }
-
-  # Step 3: Test connectivity
-  cli::cli_h3("Step 3: Testing connection...")
+  
+  # Test
+  cli::cli_h3("Testing connection...")
   reachable <- tryCatch(raix_check(), error = function(e) FALSE)
   if (isTRUE(reachable)) {
-    cli::cli_alert_success("Connected! You are ready to go.")
+    cli::cli_alert_success("Connected! Type {.code raix_chat()} to start.")
   } else {
-    cli::cli_alert_warning("Could not reach the backend. You can still use raix --- just make sure your backend is running.")
+    cli::cli_alert_warning("Not reachable. Run {.code raix_setup()} to retry.")
   }
-
-  # Step 4: Quick tutorial
-  cli::cli_h3("Step 4: Quick tutorial --- try these commands!")
-  cli::cli_bullets(c(
-	    "*" = "{.code raix_explain(\"mean\")} --- Ask raix to explain R code",
-    "*" = "{.code raix_generate(\"Create a bar chart\")} --- Generate R code from words",
-    "*" = "{.code raix_debug()} --- Debug your last error",
-    "*" = "{.code raix_chat()} --- Start an interactive chat",
-    "*" = "{.code raix_search(\"ggplot2\")} --- Search CRAN packages",
-    "*" = "{.code raix_analyze(mtcars)} --- Get help analyzing a dataset",
-    "*" = "{.code raix_diagnose(\"my_script.R\")} --- Diagnose script issues",
-    "*" = "{.code raix_google(\"R tutorial\")} --- Search Google from R",
-    "*" = "{.code raix_help()} --- See all available commands"
-  ))
-
-  cli::cli_text("")
-  cli::cli_alert_success("Setup complete! Happy coding!")
+  
+  cat("\n")
+  cli::cli_text("Quick commands: {.code raix_chat()} | {.code raix_gui()} | {.code raix_help()}")
   invisible(raix_info())
+}
+
+# Auto-detect running AI backends
+raix_autodetect <- function() {
+  # 1. Check Ollama (localhost:11434)
+  ollama_check <- try(httr::GET("http://localhost:11434/api/tags", httr::timeout(2)), silent = TRUE)
+  if (!inherits(ollama_check, "try-error") && httr::status_code(ollama_check) < 400) {
+    # Get first available model
+    models <- tryCatch({
+      parsed <- httr::content(ollama_check, "parsed", encoding = "UTF-8")
+      if (!is.null(parsed$models) && length(parsed$models) > 0) {
+        sapply(parsed$models, function(m) m$name)
+      } else NULL
+    }, error = function(e) NULL)
+    model <- if (!is.null(models) && length(models) > 0) models[1] else "llama3.2"
+    return(list(provider = "ollama", model = model, api_key = NULL))
+  }
+  
+  # 2. Check LM Studio (localhost:1234)
+  lm_check <- try(httr::GET("http://localhost:1234/v1/models", httr::timeout(2)), silent = TRUE)
+  if (!inherits(lm_check, "try-error") && httr::status_code(lm_check) < 400) {
+    return(list(provider = "lmstudio", model = "local-model", api_key = NULL))
+  }
+  
+  # 3. Check vLLM (localhost:8000)
+  vllm_check <- try(httr::GET("http://localhost:8000/v1/models", httr::timeout(2)), silent = TRUE)
+  if (!inherits(vllm_check, "try-error") && httr::status_code(vllm_check) < 400) {
+    return(list(provider = "vllm", model = "default", api_key = NULL))
+  }
+  
+  # 4. Check environment variables for API keys
+  env_checks <- list(
+    openai = "OPENAI_API_KEY",
+    claude = "ANTHROPIC_API_KEY", 
+    groq = "GROQ_API_KEY",
+    deepseek = "DEEPSEEK_API_KEY",
+    mistral = "MISTRAL_API_KEY",
+    together = "TOGETHER_API_KEY"
+  )
+  for (p in names(env_checks)) {
+    key <- Sys.getenv(env_checks[[p]])
+    if (nchar(key) > 0) {
+      preset <- PROVIDER_PRESETS[[p]]
+      return(list(provider = p, model = NULL, api_key = key))
+    }
+  }
+  
+  NULL
+}
+
+# Silent connectivity check (no CLI output)
+raix_check_silent <- function() {
+  url <- if (raix_env$api_format == "ollama") paste0(raix_env$base_url, "/api/tags")
+         else if (raix_env$api_format == "claude") paste0(raix_env$base_url, "/models")
+         else paste0(raix_env$base_url, "/models")
+  headers <- if (raix_env$api_format == "ollama") httr::add_headers(`Content-Type` = "application/json")
+    else if (raix_env$api_format == "claude") httr::add_headers(`x-api-key` = raix_env$api_key %||% "", `anthropic-version` = "2023-06-01")
+    else if (!is.null(raix_env$api_key) && nchar(raix_env$api_key) > 0)
+      httr::add_headers(Authorization = paste("Bearer", raix_env$api_key))
+    else httr::add_headers()
+  resp <- try(httr::GET(url, headers, httr::timeout(3)), silent = TRUE)
+  !inherits(resp, "try-error") && httr::status_code(resp) < 500
 }
 
 #' Search CRAN packages by topic
