@@ -34,26 +34,21 @@ raix_setup <- function(auto = TRUE, provider = NULL, model = NULL, api_key = NUL
   
   # Auto-detection
   if (auto) {
-    cli::cli_h3("Auto-detecting AI backends...")
     detected <- raix_autodetect()
     if (!is.null(detected)) {
-      cli::cli_alert_success("Auto-configured: {detected$provider} / {detected$model}")
       raix_configure(provider = detected$provider, model = detected$model,
                      api_key = detected$api_key)
       if (isTRUE(raix_check_silent())) {
-        cli::cli_alert_success("Connected! Type {.code raix_chat()} to start chatting.")
+        cli::cli_alert_success("{detected$provider} / {detected$model} --- ready!")
+        cli::cli_text("")
         cli::cli_bullets(c(
-          "*" = "{.code raix_explain('mean')} --- Explain R code",
-          "*" = "{.code raix_generate('bar chart')} --- Generate R code",
-          "*" = "{.code raix_chat()} --- Interactive chat",
-          "*" = "{.code raix_gui()} --- Chat window in RStudio Viewer",
+          "*" = "{.code raix_chat()} --- Start chatting",
+          "*" = "{.code raix_gui()} --- Open chat window",
           "*" = "{.code raix_help()} --- All commands"
         ))
         return(invisible(raix_info()))
       }
-      cli::cli_alert_info("Backend detected but not reachable. Trying interactive setup...")
-    } else {
-      cli::cli_alert_info("No running AI backends auto-detected.")
+      cli::cli_alert_warning("{detected$provider} found but not responding.")
     }
   }
   
@@ -109,19 +104,30 @@ raix_setup <- function(auto = TRUE, provider = NULL, model = NULL, api_key = NUL
   invisible(raix_info())
 }
 
-# Auto-detect running AI backends
+# Auto-detect running AI backends, pick best code model
 raix_autodetect <- function() {
   # 1. Check Ollama (localhost:11434)
   ollama_check <- try(httr::GET("http://localhost:11434/api/tags", httr::timeout(2)), silent = TRUE)
   if (!inherits(ollama_check, "try-error") && httr::status_code(ollama_check) < 400) {
-    # Get first available model
     models <- tryCatch({
       parsed <- httr::content(ollama_check, "parsed", encoding = "UTF-8")
       if (!is.null(parsed$models) && length(parsed$models) > 0) {
         sapply(parsed$models, function(m) m$name)
       } else NULL
     }, error = function(e) NULL)
-    model <- if (!is.null(models) && length(models) > 0) models[1] else "llama3.2"
+    
+    if (!is.null(models) && length(models) > 0) {
+      # Prioritize code-capable models: coder > gemma > qwen > phi > llama > mistral > first
+      priority <- c("coder", "gemma", "qwen", "phi", "llama", "mistral", "deepseek")
+      best <- NULL
+      for (p in priority) {
+        matches <- models[grepl(p, models, ignore.case = TRUE)]
+        if (length(matches) > 0) { best <- matches[1]; break }
+      }
+      model <- if (!is.null(best)) best else models[1]
+    } else {
+      model <- "llama3.2"
+    }
     return(list(provider = "ollama", model = model, api_key = NULL))
   }
   
