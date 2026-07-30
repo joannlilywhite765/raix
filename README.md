@@ -2,7 +2,7 @@
 
 [![R CMD Check](https://github.com/twomathematicians-code/air/actions/workflows/ci.yml/badge.svg)](https://github.com/twomathematicians-code/air/actions)
 [![R Package](https://img.shields.io/badge/R-Package-276DC3?logo=r)](https://www.r-project.org/)
-[![Version](https://img.shields.io/badge/version-0.2.0-blue)](https://github.com/twomathematicians-code/air)
+[![Version](https://img.shields.io/badge/version-0.4.0-blue)](https://github.com/twomathematicians-code/air)
 [![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
 [![Backends](https://img.shields.io/badge/backends-6-6366f1)](https://github.com/twomathematicians-code/air#-supported-backends)
 [![Tests](https://img.shields.io/badge/tests-29%20passing-success)](https://github.com/twomathematicians-code/air/actions)
@@ -53,12 +53,16 @@ graph TB
 # Install
 remotes::install_github("twomathematicians-code/air")
 
-# Guided setup (2 minutes)
+# Option 1: GUI Chat (like ZCode)
 library(air)
-air_setup()
-```
+air_gui()                  # ← Opens chat window in RStudio Viewer
 
-That's it. The wizard will help you choose a backend, configure it, and test the connection.
+# Option 2: Guided setup
+air_setup()                # ← 2-minute wizard
+
+# Option 3: Console
+air_chat()                 # ← Chat in your R console
+```
 
 ## 📋 All Commands
 
