@@ -1,4 +1,4 @@
-# AIR Chat — Shiny GUI for RStudio Viewer
+# raix Chat — Shiny GUI for RStudio Viewer
 # v0.4.1 — Fixed Enter-to-send, error handling, responsive layout
 
 library(shiny)
@@ -56,7 +56,7 @@ ui <- fluidPage(
     column(9, class = "chat-area",
       div(class = "messages", uiOutput("messages")),
       div(class = "input-row",
-        textAreaInput("user_input", NULL, value = "", rows = 1, placeholder = "Message AIR... (Enter to send)"),
+        textAreaInput("user_input", NULL, value = "", rows = 1, placeholder = "Message raix... (Enter to send)"),
         actionButton("send", "Send", class = "btn-primary")
       )
     )
@@ -82,11 +82,11 @@ server <- function(input, output, session) {
     sp <- if (nchar(trimws(input$system_prompt)) > 0) input$system_prompt else NULL
 
     tryCatch({
-      air_configure(provider = input$provider, model = input$model,
+      raix_configure(provider = input$provider, model = input$model,
         base_url = url, api_key = key, api_format = fmt,
         system_prompt = sp, temperature = input$temperature,
         max_tokens = input$max_tokens)
-      reachable <- tryCatch(air_check(), error = function(e) FALSE)
+      reachable <- tryCatch(raix_check(), error = function(e) FALSE)
       connected(TRUE)
       output$status <- renderUI({
         HTML(paste0('<span class="connected">●</span> ', input$provider, ' / ', input$model))
@@ -107,7 +107,7 @@ server <- function(input, output, session) {
     msgs <- c(msgs, list(list(role = "user", content = user_msg)))
     messages(msgs)
 
-    ai_response <- tryCatch(air_send(user_msg), error = function(e) paste0("❌ ", conditionMessage(e)))
+    ai_response <- tryCatch(raix_send(user_msg), error = function(e) paste0("❌ ", conditionMessage(e)))
     msgs <- messages()
     role <- if (grepl("^❌", ai_response)) "error" else "ai"
     msgs <- c(msgs, list(list(role = role, content = ai_response)))
@@ -120,7 +120,7 @@ server <- function(input, output, session) {
     msgs <- messages()
     if (length(msgs) == 0) {
       return(div(class = "empty-state",
-        h3("💬 AIR Chat"), p("Configure a model and start chatting."),
+        h3("💬 raix Chat"), p("Configure a model and start chatting."),
         p("Try: 'Explain dplyr', 'Plot mtcars mpg vs wt', 'Debug my code'")
       ))
     }

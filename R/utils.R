@@ -1,12 +1,12 @@
-# AIR --- Beginner-Friendly Utilities
+# raix --- Beginner-Friendly Utilities
 #
-# air_setup()    --- guided first-time setup wizard
-# air_search()   --- search CRAN packages
-# air_diagnose() --- diagnose R script/project issues
-# air_analyze()  --- guided data analysis assistant
-# air_google()   --- search Google from R console
-# air_rstudio()  --- RStudio integration helper
-# air_help()     --- beginner-friendly help menu
+# raix_setup()    --- guided first-time setup wizard
+# raix_search()   --- search CRAN packages
+# raix_diagnose() --- diagnose R script/project issues
+# raix_analyze()  --- guided data analysis assistant
+# raix_google()   --- search Google from R console
+# raix_rstudio()  --- RStudio integration helper
+# raix_help()     --- beginner-friendly help menu
 
 #' Guided first-time setup wizard
 #'
@@ -14,8 +14,8 @@
 #' connectivity testing, and a quick tutorial. Designed for complete beginners.
 #'
 #' @export
-air_setup <- function() {
-  cli::cli_h1("Welcome to AIR --- AI for R!")
+raix_setup <- function() {
+  cli::cli_h1("Welcome to raix --- AI for R!")
   cli::cli_text("")
   cli::cli_text("This wizard helps you connect to ANY AI model in under 2 minutes.")
   cli::cli_text("")
@@ -46,7 +46,7 @@ air_setup <- function() {
     key <- readline(cli::col_blue("API key (enter to skip): "))
     api_fmt <- readline(cli::col_blue("API format [openai/ollama/claude] (default: openai): "))
     if (nchar(trimws(api_fmt)) == 0) api_fmt <- "openai"
-    air_configure(provider = choice, model = model, base_url = url,
+    raix_configure(provider = choice, model = model, base_url = url,
                   api_key = if (nchar(trimws(key)) > 0) key else NULL,
                   api_format = api_fmt)
   } else if (choice == "ollama") {
@@ -54,42 +54,42 @@ air_setup <- function() {
     cli::cli_text("Ollama runs AI locally. Install from {.url https://ollama.com}")
     model <- readline(cli::col_blue("Model [llama3.2]: "))
     if (nchar(trimws(model)) == 0) model <- "llama3.2"
-    air_configure(provider = "ollama", model = model)
+    raix_configure(provider = "ollama", model = model)
   } else {
     cli::cli_h3("Step 2: API key")
     cli::cli_text("Get an API key from {choice}.")
     key <- readline(cli::col_blue("API key: "))
     model <- readline(cli::col_blue("Model name (enter for default): "))
     if (nchar(trimws(model)) == 0) model <- NULL
-    air_configure(provider = choice, api_key = key, model = model)
+    raix_configure(provider = choice, api_key = key, model = model)
   }
 
   # Step 3: Test connectivity
   cli::cli_h3("Step 3: Testing connection...")
-  reachable <- tryCatch(air_check(), error = function(e) FALSE)
+  reachable <- tryCatch(raix_check(), error = function(e) FALSE)
   if (isTRUE(reachable)) {
     cli::cli_alert_success("Connected! You are ready to go.")
   } else {
-    cli::cli_alert_warning("Could not reach the backend. You can still use AIR --- just make sure your backend is running.")
+    cli::cli_alert_warning("Could not reach the backend. You can still use raix --- just make sure your backend is running.")
   }
 
   # Step 4: Quick tutorial
   cli::cli_h3("Step 4: Quick tutorial --- try these commands!")
   cli::cli_bullets(c(
-    "*" = "{.code air_explain(\"mean\")} --- Ask AIR to explain R code",
-    "*" = "{.code air_generate(\"Create a bar chart\")} --- Generate R code from words",
-    "*" = "{.code air_debug()} --- Debug your last error",
-    "*" = "{.code air_chat()} --- Start an interactive chat",
-    "*" = "{.code air_search(\"ggplot2\")} --- Search CRAN packages",
-    "*" = "{.code air_analyze(mtcars)} --- Get help analyzing a dataset",
-    "*" = "{.code air_diagnose(\"my_script.R\")} --- Diagnose script issues",
-    "*" = "{.code air_google(\"R tutorial\")} --- Search Google from R",
-    "*" = "{.code air_help()} --- See all available commands"
+	    "*" = "{.code raix_explain(\"mean\")} --- Ask raix to explain R code",
+    "*" = "{.code raix_generate(\"Create a bar chart\")} --- Generate R code from words",
+    "*" = "{.code raix_debug()} --- Debug your last error",
+    "*" = "{.code raix_chat()} --- Start an interactive chat",
+    "*" = "{.code raix_search(\"ggplot2\")} --- Search CRAN packages",
+    "*" = "{.code raix_analyze(mtcars)} --- Get help analyzing a dataset",
+    "*" = "{.code raix_diagnose(\"my_script.R\")} --- Diagnose script issues",
+    "*" = "{.code raix_google(\"R tutorial\")} --- Search Google from R",
+    "*" = "{.code raix_help()} --- See all available commands"
   ))
 
   cli::cli_text("")
   cli::cli_alert_success("Setup complete! Happy coding!")
-  invisible(air_info())
+  invisible(raix_info())
 }
 
 #' Search CRAN packages by topic
@@ -101,7 +101,7 @@ air_setup <- function() {
 #'
 #' @return A data.frame of matching packages with titles
 #' @export
-air_search <- function(topic, n = 10) {
+raix_search <- function(topic, n = 10) {
   if (missing(topic) || !is.character(topic) || nchar(trimws(topic)) == 0) {
     stop("topic must be a non-empty string (e.g., 'clustering', 'plotting')")
   }
@@ -151,7 +151,7 @@ air_search <- function(topic, n = 10) {
     "Suggest the top 5 most popular CRAN packages. ",
     "Output format: package_name --- short description."
   )
-  result <- tryCatch(air_send(prompt), error = function(e) NULL)
+  result <- tryCatch(raix_send(prompt), error = function(e) NULL)
   if (!is.null(result)) {
     cat("\n", cli::col_green("AI suggestions for '{topic}':"), "\n")
     cat(result, "\n")
@@ -170,11 +170,11 @@ air_search <- function(topic, n = 10) {
 #'
 #' @return Invisibly returns diagnosis results
 #' @export
-air_diagnose <- function(path = ".") {
+raix_diagnose <- function(path = ".") {
   if (!file.exists(path)) stop("Path not found: ", path)
 
   cat("\n")
-  cli::cli_h2("AIR Project Diagnosis")
+  cli::cli_h2("raix Project Diagnosis")
   issues <- 0
 
   # Determine if path is a file or directory
@@ -251,7 +251,7 @@ air_diagnose <- function(path = ".") {
   cat("\n")
   cli::cli_h2("Diagnosis complete: {if (issues == 0) 'All clear!' else paste(issues, 'issue(s) found')}")
   if (issues > 0) {
-    cli::cli_text("Run {.code air_debug()} to get AI help fixing these issues.")
+    cli::cli_text("Run {.code raix_debug()} to get AI help fixing these issues.")
   }
   invisible(issues)
 }
@@ -262,14 +262,14 @@ air_diagnose <- function(path = ".") {
 #'
 #' @param data A data.frame to analyze
 #' @export
-air_analyze <- function(data) {
+raix_analyze <- function(data) {
   if (missing(data) || !is.data.frame(data)) {
-    stop("Please provide a data.frame (e.g., air_analyze(mtcars))")
+    stop("Please provide a data.frame (e.g., raix_analyze(mtcars))")
   }
   nm <- deparse(substitute(data))
 
   cat("\n")
-  cli::cli_h2("AIR Data Analysis: {nm}")
+  cli::cli_h2("raix Data Analysis: {nm}")
   cli::cli_text("{nrow(data)} rows x {ncol(data)} columns")
   cat("\n")
 
@@ -294,7 +294,7 @@ air_analyze <- function(data) {
   )
 
   cli::cli_alert_info("Generating analysis suggestions...")
-  result <- tryCatch(air_send(prompt), error = function(e) NULL)
+  result <- tryCatch(raix_send(prompt), error = function(e) NULL)
   if (!is.null(result)) {
     cat("\n")
     cli::cli_text(cli::col_green("AI Suggestions:"))
@@ -315,7 +315,7 @@ air_analyze <- function(data) {
 #' @param open_browser Whether to open results in your browser (default: TRUE)
 #'
 #' @export
-air_google <- function(query, open_browser = TRUE) {
+raix_google <- function(query, open_browser = TRUE) {
   if (missing(query) || !is.character(query) || nchar(trimws(query)) == 0) {
     stop("query must be a non-empty search string")
   }
@@ -334,10 +334,10 @@ air_google <- function(query, open_browser = TRUE) {
     "If this is an R-related question, include R code examples. ",
     "Keep it under 300 words."
   )
-  result <- tryCatch(air_send(prompt), error = function(e) NULL)
+  result <- tryCatch(raix_send(prompt), error = function(e) NULL)
   if (!is.null(result)) {
     cat("\n")
-    cli::cli_text(cli::col_green("AIR summary for '{query}':"))
+    cli::cli_text(cli::col_green("raix summary for '{query}':"))
     cat(result, "\n")
   }
   cat("\n", cli::col_blue("Browser URL:"), url, "\n")
@@ -346,11 +346,11 @@ air_google <- function(query, open_browser = TRUE) {
 
 #' RStudio integration helper
 #'
-#' Opens AIR in various RStudio panes for easy access.
+#' Opens raix in various RStudio panes for easy access.
 #'
 #' @param mode "pane" (Viewer), "source" (Source editor), or "console"
 #' @export
-air_rstudio <- function(mode = c("pane", "source", "console")) {
+raix_rstudio <- function(mode = c("pane", "source", "console")) {
   if (!requireNamespace("rstudioapi", quietly = TRUE)) {
 	    cli::cli_alert_warning("RStudio API not available -- are you in RStudio?")
     return(invisible(NULL))
@@ -358,82 +358,82 @@ air_rstudio <- function(mode = c("pane", "source", "console")) {
   mode <- match.arg(mode)
 
   if (mode == "pane") {
-    cli::cli_alert_info("Opening AIR cheat sheet in Viewer pane...")
+    cli::cli_alert_info("Opening raix cheat sheet in Viewer pane...")
     html <- paste0(
-      "<h2>AIR --- AI for R</h2>",
+      "<h2>raix --- AI for R</h2>",
       "<table><tr><th>Task</th><th>Command</th></tr>",
-      "<tr><td>Setup AI</td><td><code>air_setup()</code></td></tr>",
-      "<tr><td>Chat with AI</td><td><code>air_chat()</code></td></tr>",
-      "<tr><td>Explain code</td><td><code>air_explain()</code></td></tr>",
-      "<tr><td>Debug error</td><td><code>air_debug()</code></td></tr>",
-      "<tr><td>Generate code</td><td><code>air_generate()</code></td></tr>",
-      "<tr><td>Document function</td><td><code>air_document()</code></td></tr>",
-      "<tr><td>Search CRAN</td><td><code>air_search()</code></td></tr>",
-      "<tr><td>Analyze data</td><td><code>air_analyze()</code></td></tr>",
-      "<tr><td>Diagnose project</td><td><code>air_diagnose()</code></td></tr>",
-      "<tr><td>Google search</td><td><code>air_google()</code></td></tr>",
-      "<tr><td>Check connection</td><td><code>air_check()</code></td></tr>",
-      "<tr><td>Configuration</td><td><code>air_info()</code></td></tr>",
+      "<tr><td>Setup AI</td><td><code>raix_setup()</code></td></tr>",
+      "<tr><td>Chat with AI</td><td><code>raix_chat()</code></td></tr>",
+      "<tr><td>Explain code</td><td><code>raix_explain()</code></td></tr>",
+      "<tr><td>Debug error</td><td><code>raix_debug()</code></td></tr>",
+      "<tr><td>Generate code</td><td><code>raix_generate()</code></td></tr>",
+      "<tr><td>Document function</td><td><code>raix_document()</code></td></tr>",
+      "<tr><td>Search CRAN</td><td><code>raix_search()</code></td></tr>",
+      "<tr><td>Analyze data</td><td><code>raix_analyze()</code></td></tr>",
+      "<tr><td>Diagnose project</td><td><code>raix_diagnose()</code></td></tr>",
+      "<tr><td>Google search</td><td><code>raix_google()</code></td></tr>",
+      "<tr><td>Check connection</td><td><code>raix_check()</code></td></tr>",
+      "<tr><td>Configuration</td><td><code>raix_info()</code></td></tr>",
       "</table>"
     )
     temp <- tempfile(fileext = ".html")
     writeLines(html, temp)
     rstudioapi::viewer(temp)
   } else if (mode == "source") {
-    cli::cli_alert_info("Opening AIR setup script in Source editor...")
-    rstudioapi::navigateToFile(system.file("R/air.R", package = "raix"))
+    cli::cli_alert_info("Opening raix setup script in Source editor...")
+	    rstudioapi::navigateToFile(system.file("R/raix.R", package = "raix"))
   } else {
-    cli::cli_alert_info("AIR is ready! Type {.code air_help()} to see all commands.")
+    cli::cli_alert_info("raix is ready! Type {.code raix_help()} to see all commands.")
   }
   invisible(NULL)
 }
 
 #' Beginner-friendly help menu
 #'
-#' Shows all AIR commands organized by task, with usage examples.
+#' Shows all raix commands organized by task, with usage examples.
 #'
 #' @export
-air_help <- function() {
+raix_help <- function() {
   cat("\n")
-  cli::cli_h1("AIR --- AI for R")
+  cli::cli_h1("raix --- AI for R")
   cli::cli_text("Your AI coding assistant for RStudio")
   cat("\n")
 
 	  cli::cli_h3("[Setup] Getting Started")
 	  cli::cli_bullets(c(
-	    "*" = "{.code air_setup()} --- Guided first-time setup (2 min)",
-	    "*" = "{.code air_info()} --- Show current configuration",
-	    "*" = "{.code air_check()} --- Test AI backend connectivity"
+	    "*" = "{.code raix_setup()} --- Guided first-time setup (2 min)",
+	    "*" = "{.code raix_info()} --- Show current configuration",
+	    "*" = "{.code raix_check()} --- Test AI backend connectivity"
 	  ))
 
 	  cli::cli_h3("[Chat] AI Assistance")
 	  cli::cli_bullets(c(
-	    "*" = "{.code air_chat()} --- Interactive chat with AI",
-	    "*" = "{.code air_send('question')} --- Send one message to AI",
-	    "*" = "{.code air_google('topic')} --- Search Google from R"
+	    "*" = "{.code raix_chat()} --- Interactive chat with AI",
+	    "*" = "{.code raix_send('question')} --- Send one message to AI",
+	    "*" = "{.code raix_google('topic')} --- Search Google from R"
 	  ))
 
 	  cli::cli_h3("[Code] Code Development")
 	  cli::cli_bullets(c(
-	    "*" = "{.code air_explain('code')} --- Explain what R code does",
-	    "*" = "{.code air_generate('task')} --- Generate R code from description",
-	    "*" = "{.code air_debug()} --- Debug your last R error",
-	    "*" = "{.code air_document('fn')} --- Generate roxygen2 documentation"
+	    "*" = "{.code raix_explain('code')} --- Explain what R code does",
+	    "*" = "{.code raix_generate('task')} --- Generate R code from description",
+	    "*" = "{.code raix_debug()} --- Debug your last R error",
+	    "*" = "{.code raix_document('fn')} --- Generate roxygen2 documentation"
 	  ))
 
 	  cli::cli_h3("[Data] Data & Project Tools")
 	  cli::cli_bullets(c(
-	    "*" = "{.code air_analyze(mtcars)} --- Guided data analysis",
-	    "*" = "{.code air_search('topic')} --- Find CRAN packages",
-	    "*" = "{.code air_diagnose('script.R')} --- Diagnose script issues"
+	    "*" = "{.code raix_analyze(mtcars)} --- Guided data analysis",
+	    "*" = "{.code raix_search('topic')} --- Find CRAN packages",
+	    "*" = "{.code raix_diagnose('script.R')} --- Diagnose script issues"
 	  ))
 
 		  cli::cli_h3("[Config] Configuration")
 		  cli::cli_bullets(c(
-		    "*" = "{.code air_configure(provider = 'ollama')} --- Switch AI provider",
+		    "*" = "{.code raix_configure(provider = 'ollama')} --- Switch AI provider",
 		    "*" = "13+ providers: ollama, openai, claude, groq, mistral, deepseek, kimi, zai, perplexity, together, lmstudio, vllm, openrouter --- or any custom endpoint"
 		  ))
 
   cat("\n")
-  cli::cli_text("Run {.code air_setup()} for a guided walkthrough!")
+  cli::cli_text("Run {.code raix_setup()} for a guided walkthrough!")
 }

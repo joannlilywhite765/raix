@@ -33,13 +33,13 @@ remotes::install_github("twomathematicians-code/raix")
 library(raix)
 
 # One-command setup wizard
-air_setup()
+raix_setup()
 
 # Or configure manually
-air_configure(provider = "ollama", model = "llama3.2")
+raix_configure(provider = "ollama", model = "llama3.2")
 
 # Start chatting
-air_chat()
+raix_chat()
 ```
 
 ---
@@ -47,16 +47,16 @@ air_chat()
 ## Features
 
 - **Any model, any provider.** 13+ presets (OpenAI, Claude, Ollama, Groq, Mistral, DeepSeek, and more) plus any custom OpenAI-compatible endpoint.
-- **Chat GUI.** Open `air_gui()` for a full chat window in RStudio Viewer — configure models, switch providers, and chat without limits.
-- **Code explanation.** `air_explain("lapply(mtcars, mean)")` — get plain-English explanations of any R code.
-- **Code generation.** `air_generate("Create an interactive plotly scatter plot")` — turn descriptions into working R code.
-- **Error debugging.** `air_debug()` — run it right after an error and the AI diagnoses the root cause.
-- **Roxygen documentation.** `air_document("f <- function(x) x + 1")` — generate roxygen2 docs automatically.
-- **CRAN package search.** `air_search("time series")` — find relevant packages without leaving R.
-- **Data analysis assistant.** `air_analyze(mtcars)` — get AI-suggested analyses for any data.frame.
-- **Script diagnosis.** `air_diagnose("my_script.R")` — scan for missing packages, syntax errors, and anti-patterns.
-- **Google search.** `air_google("R tidyverse tutorial")` — search the web from R with AI summary.
-- **Beginner-friendly.** `air_setup()` walks first-time users through everything in under 2 minutes.
+- **Chat GUI.** Open `raix_gui()` for a full chat window in RStudio Viewer — configure models, switch providers, and chat without limits.
+- **Code explanation.** `raix_explain("lapply(mtcars, mean)")` — get plain-English explanations of any R code.
+- **Code generation.** `raix_generate("Create an interactive plotly scatter plot")` — turn descriptions into working R code.
+- **Error debugging.** `raix_debug()` — run it right after an error and the AI diagnoses the root cause.
+- **Roxygen documentation.** `raix_document("f <- function(x) x + 1")` — generate roxygen2 docs automatically.
+- **CRAN package search.** `raix_search("time series")` — find relevant packages without leaving R.
+- **Data analysis assistant.** `raix_analyze(mtcars)` — get AI-suggested analyses for any data.frame.
+- **Script diagnosis.** `raix_diagnose("my_script.R")` — scan for missing packages, syntax errors, and anti-patterns.
+- **Google search.** `raix_google("R tidyverse tutorial")` — search the web from R with AI summary.
+- **Beginner-friendly.** `raix_setup()` walks first-time users through everything in under 2 minutes.
 - **Privacy-first.** Ollama runs entirely locally — your code never leaves your machine.
 
 ---
@@ -88,49 +88,49 @@ All providers that expose an OpenAI-compatible `/v1/chat/completions` endpoint w
 
 ```r
 library(raix)
-air_configure(provider = "ollama", model = "llama3.2")
-air_chat()
+raix_configure(provider = "ollama", model = "llama3.2")
+raix_chat()
 
 You> What does the `%>%` operator do in R?
-AIR> The `%>%` (pipe) operator comes from the magrittr package...
+raix> The `%>%` (pipe) operator comes from the magrittr package...
 ```
 
 ### GUI Chat
 
 ```r
-air_gui()  # Opens chat window in RStudio Viewer
+raix_gui()  # Opens chat window in RStudio Viewer
 ```
 
 ### Code Assistance
 
 ```r
 # Explain code
-air_explain("sapply(split(mtcars$mpg, mtcars$cyl), mean)")
+raix_explain("sapply(split(mtcars$mpg, mtcars$cyl), mean)")
 
 # Debug your last error
-air_debug()
+raix_debug()
 
 # Generate code from description
-air_generate("Create a heatmap of correlation matrix using ggplot2")
+raix_generate("Create a heatmap of correlation matrix using ggplot2")
 
 # Generate documentation
-air_document("f <- function(x) x^2")
+raix_document("f <- function(x) x^2")
 ```
 
 ### Data & Project Tools
 
 ```r
 # Search CRAN for packages
-air_search("clustering")
+raix_search("clustering")
 
 # Get AI analysis suggestions for your dataset
-air_analyze(iris)
+raix_analyze(iris)
 
 # Diagnose your R script
-air_diagnose("analysis.R")
+raix_diagnose("analysis.R")
 
 # Search Google from R
-air_google("how to use pivot_longer in R")
+raix_google("how to use pivot_longer in R")
 ```
 
 ---
@@ -139,10 +139,10 @@ air_google("how to use pivot_longer in R")
 
 ```r
 # Use a preset provider
-air_configure(provider = "openai", model = "gpt-4o", api_key = "sk-...")
+raix_configure(provider = "openai", model = "gpt-4o", api_key = "sk-...")
 
 # Use any custom OpenAI-compatible endpoint
-air_configure(
+raix_configure(
   provider = "my-api",
   model = "custom-model",
   base_url = "https://api.example.com/v1",
@@ -150,10 +150,10 @@ air_configure(
 )
 
 # Check current configuration
-air_info()
+raix_info()
 
 # Test connectivity
-air_check()
+raix_check()
 ```
 
 ---

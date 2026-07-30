@@ -1,11 +1,11 @@
-\name{air_send}
-\alias{air_send}
-\title{air_send}
+\name{raix_send}
+\alias{raix_send}
+\title{raix_send}
 \description{
-  Function air_send from the raix package.
+  Function raix_send from the raix package.
 }
 \usage{
-  air_send(prompt, context = NULL, stream = FALSE)
+  raix_send(prompt, context = NULL, stream = FALSE)
 }
 \arguments{
   \item{prompt}{Argument.}
@@ -14,7 +14,7 @@
 }
 \examples{
 \dontrun{
-  air_send()
+  raix_send()
 }
 }
 \keyword{internal}

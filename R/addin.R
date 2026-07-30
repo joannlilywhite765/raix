@@ -1,13 +1,13 @@
-# AIR RStudio Add-in --- Quick Chat
+# raix RStudio Add-in --- Quick Chat
 #
-# Adds an RStudio Add-in that opens the AIR GUI directly
+# Adds an RStudio Add-in that opens the raix GUI directly
 
-air_addin_chat <- function() {
-  air_configure(provider = getOption("air.provider", "ollama"),
-                model = getOption("air.model", "llama3.2"))
+raix_addin_chat <- function() {
+  raix_configure(provider = getOption("raix.provider", "ollama"),
+                model = getOption("raix.model", "llama3.2"))
   if (requireNamespace("shiny", quietly = TRUE)) {
-    air_gui()
+    raix_gui()
   } else {
-    air_chat()
+    raix_chat()
   }
 }

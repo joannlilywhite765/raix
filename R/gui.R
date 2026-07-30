@@ -1,10 +1,10 @@
-#' Open AIR Chat GUI
+#' Open raix Chat GUI
 #'
 #' Opens a chat window in RStudio Viewer (like ZCode).
 #' Configure models, switch providers, and chat without limitations.
 #'
 #' @export
-air_gui <- function() {
+raix_gui <- function() {
   if (!requireNamespace("shiny", quietly = TRUE)) {
     stop("Package 'shiny' is required. Install with: install.packages('shiny')")
   }

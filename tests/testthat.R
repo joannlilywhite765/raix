@@ -1,2 +1,2 @@
 library(testthat)
-test_check("air")
+test_check("raix")

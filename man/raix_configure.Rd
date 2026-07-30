@@ -1,11 +1,11 @@
-\name{air_configure}
-\alias{air_configure}
-\title{air_configure}
+\name{raix_configure}
+\alias{raix_configure}
+\title{raix_configure}
 \description{
-  Function air_configure from the raix package.
+  Function raix_configure from the raix package.
 }
 \usage{
-  air_configure(provider = NULL, model = NULL, api_key = NULL,
+  raix_configure(provider = NULL, model = NULL, api_key = NULL,
                           base_url = NULL, api_format = NULL,
                           system_prompt = NULL, temperature = NULL,
                           max_tokens = NULL)
@@ -22,7 +22,7 @@
 }
 \examples{
 \dontrun{
-  air_configure()
+  raix_configure()
 }
 }
 \keyword{internal}
