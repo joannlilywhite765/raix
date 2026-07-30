@@ -1,6 +1,6 @@
-Package: air
+Package: rair
 Type: Package
-Title: AI for R — Live AI Assistance in RStudio
+Title: rair — AI for R — Live AI Assistance in RStudio
 Version: 0.4.1
 Authors@R: c(
     person("Mahesh", "Solanki", email = "maheshsinh1910@gmail.com",
