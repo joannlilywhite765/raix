@@ -39,8 +39,8 @@ raix_setup()
 # Or configure manually
 raix_configure(provider = "ollama", model = "llama3.2")
 
-# Start chatting
-raix_chat()
+# Or start solving immediately
+raix_solve("Analyze mtcars: find what predicts mpg, with plots")
 ```
 
 ---
@@ -59,7 +59,41 @@ raix_chat()
 - **Google search.** `raix_google("R tidyverse tutorial")` — search the web from R with AI summary.
 - **Beginner-friendly.** `raix_setup()` auto-detects your setup — one command, zero configuration.
 - **Small-model optimized.** Auto-detects 7B-9B models (qwen2.5-coder, phi3.5, gemma2, llama3.2) and switches to concise, directive prompts that work reliably on local hardware.
+- **Developer agent.** `raix_solve("problem")` generates complete R solutions. `raix_script()` and `raix_notebook()` create .R and .Rmd files. `raix_project()` scans your directory for full context.
 - **Privacy-first.** Ollama runs entirely locally — your code never leaves your machine.
+
+---
+
+## Developer Agent
+
+Beyond chat, raix acts as an autonomous coding agent that reads your project, plans solutions, and writes complete code:
+
+```r
+# Scan your project — raix reads all .R, .Rmd, and data files
+raix_project(".")
+
+# Solve problems end-to-end
+raix_solve("Build a random forest model to predict house prices from this dataset",
+           data = housing_data)
+
+# Generate complete scripts and notebooks
+raix_script("ETL pipeline: clean, transform, and export customer data", 
+            output = "etl_pipeline.R")
+
+raix_notebook("Exploratory analysis of sales trends with visualizations",
+              output = "sales_analysis.Rmd",
+              data = sales_df)
+
+# Find the best package for any task
+raix_package("time series forecasting with ARIMA")
+
+# Read files with AI summarization
+raix_read("complex_analysis.R", summarize = TRUE)
+
+# Write AI-generated content directly to files
+raix_write("A function to validate email addresses with regex",
+           file = "R/validate_email.R", type = "code")
+```
 
 ---
 

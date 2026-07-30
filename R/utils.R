@@ -512,14 +512,25 @@ raix_help <- function() {
 	    "*" = "{.code raix_document('fn')} --- Generate roxygen2 documentation"
 	  ))
 
-	  cli::cli_h3("[Data] Data & Project Tools")
-	  cli::cli_bullets(c(
-	    "*" = "{.code raix_analyze(mtcars)} --- Guided data analysis",
-	    "*" = "{.code raix_search('topic')} --- Find CRAN packages",
-	    "*" = "{.code raix_diagnose('script.R')} --- Diagnose script issues"
-	  ))
+  cli::cli_h3("[Data] Data & Project Tools")
+  cli::cli_bullets(c(
+    "*" = "{.code raix_analyze(mtcars)} --- Guided data analysis",
+    "*" = "{.code raix_search('topic')} --- Find CRAN packages",
+    "*" = "{.code raix_diagnose('script.R')} --- Diagnose script issues"
+  ))
 
-		  cli::cli_h3("[Config] Configuration")
+  cli::cli_h3("[Dev] Developer Agent")
+  cli::cli_bullets(c(
+    "*" = "{.code raix_solve('problem')} --- Full solution from description",
+    "*" = "{.code raix_script('problem', 'out.R')} --- Generate .R script",
+    "*" = "{.code raix_notebook('problem', 'out.Rmd')} --- Generate .Rmd notebook",
+    "*" = "{.code raix_project('.')} --- Scan project for AI context",
+    "*" = "{.code raix_package('task')} --- Find best package for task",
+    "*" = "{.code raix_read('file.R')} --- Read file with AI summary",
+    "*" = "{.code raix_write('desc', 'out.R')} --- Write AI content to file"
+  ))
+
+  cli::cli_h3("[Config] Configuration")
 		  cli::cli_bullets(c(
 		    "*" = "{.code raix_configure(provider = 'ollama')} --- Switch AI provider",
 		    "*" = "13+ providers: ollama, openai, claude, groq, mistral, deepseek, kimi, zai, perplexity, together, lmstudio, vllm, openrouter --- or any custom endpoint"
@@ -527,4 +538,440 @@ raix_help <- function() {
 
   cat("\n")
   cli::cli_text("Run {.code raix_setup()} for a guided walkthrough!")
+}
+
+# ── Developer Agent Utilities ─────────────────────────────────────────────
+
+#' Solve a data problem end-to-end with AI
+#'
+#' Describe your problem in plain English and get a complete, runnable
+#' R solution. raix automatically selects the best packages, plans the
+#' approach, and generates production-ready code.
+#'
+#' @param problem Description of the data problem to solve
+#' @param data Optional data.frame or path to data file for context
+#' @param output Optional file path to write the solution (.R or .Rmd)
+#' @param execute If TRUE, runs the generated code and returns results
+#'
+#' @return The generated solution (invisibly)
+#' @export
+raix_solve <- function(problem, data = NULL, output = NULL, execute = FALSE) {
+  if (missing(problem) || !is.character(problem) || nchar(trimws(problem)) == 0) {
+    stop("problem must be a non-empty description of what you want to solve")
+  }
+  
+  cli::cli_h1("raix Solver")
+  cli::cli_text("Problem: {problem}")
+  
+  # Build context
+  context <- raix_build_context(data)
+  
+  # Step 1: Plan
+  cli::cli_h3("Step 1: Planning solution...")
+  plan_prompt <- if (raix_env$small_model) {
+    paste0("Task: ", problem, "\n",
+           context, "\n",
+           "List: 1) Best R packages 2) Approach steps (3-4 max)")
+  } else {
+    paste0("I need to solve this data problem in R:\n\n", problem, "\n\n",
+           context, "\n\n",
+           "First, tell me: 1) Which R packages should I use and why? ",
+           "2) What's the step-by-step approach? Keep it concise.")
+  }
+  plan <- tryCatch(raix_send(plan_prompt), error = function(e) NULL)
+  if (!is.null(plan)) {
+    cat("\n", cli::col_blue("Plan:"), "\n", plan, "\n\n")
+  }
+  
+  # Step 2: Generate code
+  cli::cli_h3("Step 2: Generating R code...")
+  code_prompt <- if (raix_env$small_model) {
+    paste0("Write complete R code for: ", problem, "\n",
+           context, "\n",
+           if (!is.null(plan)) paste0("Plan: ", plan, "\n") else "",
+           "Output ONLY the R code. Include library() calls. Use base R when possible.")
+  } else {
+    paste0("Write a complete, runnable R script for this problem:\n\n", problem, "\n\n",
+           context, "\n\n",
+           if (!is.null(plan)) paste0("Follow this plan:\n", plan, "\n\n") else "",
+           "Include: library() calls, data loading, analysis, visualization, and comments. ",
+           "Output ONLY the R code, ready to source().")
+  }
+  
+  solution <- tryCatch(raix_send(code_prompt), error = function(e) NULL)
+  if (is.null(solution)) {
+    cli::cli_alert_danger("Failed to generate solution. Check your AI backend.")
+    return(invisible(NULL))
+  }
+  
+  # Extract code from markdown if needed
+  solution <- raix_extract_code(solution)
+  
+  cat("\n")
+  cli::cli_text(cli::col_green("Solution:"))
+  cat(solution, "\n")
+  
+  # Write to file
+  if (!is.null(output)) {
+    writeLines(solution, output)
+    cli::cli_alert_success("Solution written to {.file {output}}")
+  }
+  
+  # Execute
+  if (execute) {
+    cli::cli_h3("Step 3: Executing...")
+    result <- tryCatch(eval(parse(text = solution)), error = function(e) {
+      cli::cli_alert_danger("Execution error: {conditionMessage(e)}")
+      NULL
+    })
+    if (!is.null(result)) {
+      cli::cli_alert_success("Code executed successfully!")
+      return(invisible(list(code = solution, result = result)))
+    }
+  }
+  
+  invisible(solution)
+}
+
+#' Generate a complete R script from a problem description
+#'
+#' Creates a .R file with the full solution. Like raix_solve() but
+#' always writes to a file and returns the path.
+#'
+#' @param problem Problem description
+#' @param output Path for the .R file (default: auto-generated name)
+#' @param data Optional data for context
+#' @return Path to the generated script (invisibly)
+#' @export
+raix_script <- function(problem, output = NULL, data = NULL) {
+  if (is.null(output)) {
+    output <- paste0("raix_solution_", format(Sys.time(), "%Y%m%d_%H%M%S"), ".R")
+  }
+  raix_solve(problem = problem, data = data, output = output, execute = FALSE)
+  if (file.exists(output)) {
+    cli::cli_alert_success("Script created: {.file {output}}")
+    if (requireNamespace("rstudioapi", quietly = TRUE) && rstudioapi::isAvailable()) {
+      rstudioapi::navigateToFile(output)
+    }
+  }
+  invisible(output)
+}
+
+#' Generate a complete R Markdown notebook from a problem description
+#'
+#' Creates a polished .Rmd file with markdown explanations, code chunks,
+#' and visualizations. Ready to knit to HTML/PDF.
+#'
+#' @param problem Problem description
+#' @param output Path for the .Rmd file (default: auto-generated name)
+#' @param data Optional data.frame or file path for context
+#' @param title Title for the notebook
+#' @return Path to the generated notebook (invisibly)
+#' @export
+raix_notebook <- function(problem, output = NULL, data = NULL, title = NULL) {
+  if (is.null(output)) {
+    output <- paste0("raix_notebook_", format(Sys.time(), "%Y%m%d_%H%M%S"), ".Rmd")
+  }
+  if (is.null(title)) title <- problem
+  
+  context <- raix_build_context(data)
+  
+  cli::cli_h1("raix Notebook Generator")
+  
+  prompt <- if (raix_env$small_model) {
+    paste0("Create R Markdown notebook for: ", problem, "\n",
+           context, "\n",
+           "Title: ", title, "\n",
+           "Include: setup chunk, code chunks, brief text. Output complete .Rmd.")
+  } else {
+    paste0("Create a complete R Markdown (.Rmd) notebook for this task:\n\n", problem, "\n\n",
+           context, "\n\n",
+           "The notebook title is: ", title, "\n\n",
+           "Include: YAML header (html_document), setup chunk with library() calls, ",
+           "multiple labeled code chunks with explanations in markdown between them, ",
+           "and a summary section at the end. Make it professional and ready to knit.",
+           "\n\nOutput the COMPLETE .Rmd file content.")
+  }
+  
+  notebook <- tryCatch(raix_send(prompt), error = function(e) NULL)
+  if (is.null(notebook)) {
+    cli::cli_alert_danger("Failed to generate notebook.")
+    return(invisible(NULL))
+  }
+  
+  notebook <- raix_extract_code(notebook)
+  writeLines(notebook, output)
+  cli::cli_alert_success("Notebook created: {.file {output}}")
+  
+  if (requireNamespace("rstudioapi", quietly = TRUE) && rstudioapi::isAvailable()) {
+    rstudioapi::navigateToFile(output)
+  }
+  invisible(output)
+}
+
+#' Scan a project directory and build context for AI
+#'
+#' Reads R scripts, Rmd files, data files, and project structure
+#' to give the AI full context about your project.
+#'
+#' @param path Project directory path (default: current directory)
+#' @return A list with project context (invisibly)
+#' @export
+raix_project <- function(path = ".") {
+  if (!dir.exists(path)) stop("Directory not found: ", path)
+  
+  cli::cli_h1("raix Project Scan")
+  cli::cli_text("Scanning: {normalizePath(path)}")
+  
+  # File inventory
+  all_files <- list.files(path, recursive = TRUE, full.names = TRUE)
+  r_files <- list.files(path, pattern = "\\.R$", recursive = TRUE, full.names = TRUE)
+  rmd_files <- list.files(path, pattern = "\\.[Rr]md$", recursive = TRUE, full.names = TRUE)
+  data_files <- list.files(path, pattern = "\\.(csv|tsv|xlsx|rds|rda)$", recursive = TRUE, full.names = TRUE)
+  
+  cli::cli_bullets(c(
+    "*" = "R scripts: {length(r_files)}",
+    "*" = "R Markdown: {length(rmd_files)}",
+    "*" = "Data files: {length(data_files)}",
+    "*" = "Total files: {length(all_files)}"
+  ))
+  
+  # Build context
+  context_lines <- c(
+    paste0("Project path: ", normalizePath(path)),
+    paste0("R version: ", R.version.string),
+    paste0("Installed packages: ", paste(head(rownames(installed.packages()), 30), collapse = ", "), "..."),
+    "",
+    "=== R Scripts ==="
+  )
+  
+  for (f in head(r_files, 5)) {
+    content <- tryCatch(paste(readLines(f, warn = FALSE), collapse = "\n"), error = function(e) "(unreadable)")
+    context_lines <- c(context_lines, paste0("--- ", basename(f), " ---"), substr(content, 1, 2000))
+  }
+  
+  if (length(rmd_files) > 0) {
+    context_lines <- c(context_lines, "", "=== R Markdown Files ===")
+    for (f in head(rmd_files, 3)) {
+      content <- tryCatch(paste(readLines(f, warn = FALSE), collapse = "\n"), error = function(e) "(unreadable)")
+      context_lines <- c(context_lines, paste0("--- ", basename(f), " ---"), substr(content, 1, 2000))
+    }
+  }
+  
+  if (length(data_files) > 0) {
+    context_lines <- c(context_lines, "", paste0("Data files: ", paste(basename(data_files), collapse = ", ")))
+  }
+  
+  context <- paste(context_lines, collapse = "\n")
+  
+  # Store for later use
+  raix_env$project_context <- context
+  raix_env$project_path <- normalizePath(path)
+  
+  cli::cli_alert_success("Project context loaded ({nchar(context)} chars)")
+  cli::cli_text("Use {.code raix_solve()} with full project awareness.")
+  
+  invisible(list(path = normalizePath(path), files = all_files, context = context))
+}
+
+#' Find the best R package for a specific task
+#'
+#' Searches CRAN and uses AI to recommend the most suitable, well-maintained
+#' R package for any data task.
+#'
+#' @param task Description of what you want to do (e.g., "survival analysis", "text mining")
+#' @return Recommended packages with install commands (invisibly)
+#' @export
+raix_package <- function(task) {
+  if (missing(task) || !is.character(task) || nchar(trimws(task)) == 0) {
+    stop("task must describe what you want to do (e.g., 'deep learning', 'geo mapping')")
+  }
+  
+  cli::cli_h2("Finding best packages for: {task}")
+  
+  # First try CRAN search
+  pkgs <- tryCatch(raix_search(task, n = 5), error = function(e) NULL)
+  
+  # Then get AI recommendation with comparison
+  prompt <- if (raix_env$small_model) {
+    paste0("Best R package for: ", task, ". Name top 2. 1 line each why.")
+  } else {
+    paste0("What is the single best R package for: ", task, "? ",
+           "Consider: popularity, maintenance, ease of use, performance. ",
+           "If there are multiple good options, compare them briefly. ",
+           "Output: package_name --- reason")
+  }
+  
+  suggestion <- tryCatch(raix_send(prompt), error = function(e) NULL)
+  if (!is.null(suggestion)) {
+    cat("\n", cli::col_green("AI Recommendation:"), "\n")
+    cat(suggestion, "\n\n")
+  }
+  
+  invisible(suggestion)
+}
+
+#' Read a file with AI-powered summarization
+#'
+#' Reads any text file and optionally summarizes or explains it with AI.
+#'
+#' @param file Path to the file
+#' @param summarize If TRUE, AI summarizes the content
+#' @return File content (invisibly)
+#' @export
+raix_read <- function(file, summarize = FALSE) {
+  if (!file.exists(file)) stop("File not found: ", file)
+  
+  ext <- tolower(tools::file_ext(file))
+  is_binary <- ext %in% c("rds", "rda", "rdata", "xlsx", "xls", "png", "jpg", "pdf")
+  
+  if (is_binary) {
+    info <- file.info(file)
+    cli::cli_bullets(c(
+      "*" = "File: {basename(file)}",
+      "*" = "Type: {ext} (binary)",
+      "*" = "Size: {utils:::format.object_size(info$size, 'auto')}"
+    ))
+    return(invisible(list(path = file, type = ext, size = info$size)))
+  }
+  
+  content <- tryCatch(paste(readLines(file, warn = FALSE), collapse = "\n"), 
+                      error = function(e) stop("Cannot read file: ", conditionMessage(e)))
+  
+  cli::cli_h2("Reading: {basename(file)}")
+  cli::cli_text("{nchar(content)} chars | {length(strsplit(content, '\\n')[[1]])} lines")
+  
+  if (summarize && nchar(content) > 100) {
+    prompt <- paste0("Summarize this file in 2-3 bullet points:\n\n", 
+                     substr(content, 1, 3000))
+    summary <- tryCatch(raix_send(prompt), error = function(e) NULL)
+    if (!is.null(summary)) {
+      cat("\n", cli::col_green("Summary:"), "\n", summary, "\n")
+    }
+  } else if (!summarize) {
+    cat("\n", substr(content, 1, 2000), 
+        if (nchar(content) > 2000) "\n... (truncated)" else "", "\n")
+  }
+  
+  invisible(content)
+}
+
+#' Write AI-generated content to a file
+#'
+#' Sends a description to the AI, gets the generated content,
+#' and writes it directly to a file.
+#'
+#' @param description What to generate
+#' @param file Output file path
+#' @param type "code" for R code, "text" for prose, "rmd" for R Markdown
+#' @return Path to the created file (invisibly)
+#' @export
+raix_write <- function(description, file, type = c("code", "text", "rmd")) {
+  if (missing(description) || !is.character(description)) {
+    stop("description must be a non-empty character string")
+  }
+  type <- match.arg(type)
+  
+  cli::cli_h2("Generating {type} file: {.file {file}}")
+  
+  prompt <- switch(type,
+    code = if (raix_env$small_model) {
+      paste0("Write R code. Output ONLY code.\n", description)
+    } else {
+      paste0("Write a complete R script for:\n\n", description, "\n\nOutput ONLY the R code.")
+    },
+    text = paste0("Write content for: ", description),
+    rmd = if (raix_env$small_model) {
+      paste0("Create Rmd for: ", description, "\nInclude: YAML, code chunks, text.")
+    } else {
+      paste0("Create a complete R Markdown notebook for:\n\n", description,
+             "\n\nInclude YAML header, code chunks, and markdown text. Output the full .Rmd.")
+    }
+  )
+  
+  content <- tryCatch(raix_send(prompt), error = function(e) {
+    cli::cli_alert_danger("Generation failed: {conditionMessage(e)}")
+    NULL
+  })
+  
+  if (is.null(content)) return(invisible(NULL))
+  
+  content <- raix_extract_code(content)
+  writeLines(content, file)
+  cli::cli_alert_success("Written {nchar(content)} chars to {.file {file}}")
+  
+  # Open in RStudio if available
+  if (requireNamespace("rstudioapi", quietly = TRUE) && rstudioapi::isAvailable()) {
+    rstudioapi::navigateToFile(file)
+  }
+  
+  invisible(file)
+}
+
+# ── Internal Helpers ───────────────────────────────────────────────────────
+
+# Build context string from optional data parameter
+raix_build_context <- function(data = NULL) {
+  lines <- c()
+  
+  # R environment info
+  lines <- c(lines, paste0("R version: ", R.version.string))
+  lines <- c(lines, paste0("Working directory: ", getwd()))
+  
+  # Data info
+  if (!is.null(data)) {
+    if (is.data.frame(data)) {
+      nm <- deparse(substitute(data))
+      lines <- c(lines, paste0("Data: ", nm, " (", nrow(data), " rows x ", ncol(data), " cols)"))
+      lines <- c(lines, paste0("Columns: ", paste(head(names(data), 20), collapse = ", ")))
+      # Sample
+      capture <- utils::capture.output(str(data, give.attr = FALSE, list.len = 5))
+      lines <- c(lines, paste(capture, collapse = "\n"))
+    } else if (is.character(data) && file.exists(data)) {
+      lines <- c(lines, paste0("Data file: ", data))
+      if (grepl("\\.csv$", data, ignore.case = TRUE)) {
+        preview <- tryCatch(readLines(data, n = 3), error = function(e) NULL)
+        if (!is.null(preview)) lines <- c(lines, "Preview:", preview)
+      }
+    }
+  }
+  
+  # Project context if available
+  if (!is.null(raix_env$project_context)) {
+    lines <- c(lines, "", "=== Project Context ===", 
+               substr(raix_env$project_context, 1, 2000))
+  }
+  
+  # Installed packages
+  pkgs <- head(rownames(installed.packages()), 40)
+  lines <- c(lines, "", paste0("Key installed packages: ", paste(pkgs, collapse = ", ")))
+  
+  paste(lines, collapse = "\n")
+}
+
+# Extract code from markdown code blocks
+raix_extract_code <- function(text) {
+  if (is.null(text)) return("")
+  # If there are ``` blocks, extract content from the first complete one
+  if (grepl("```", text)) {
+    # Try to find R code blocks first
+    blocks <- regmatches(text, gregexpr("```\\{?r?\\}?\\s*\\n([\\s\\S]*?)```", text, perl = TRUE))[[1]]
+    if (length(blocks) > 0) {
+      # Extract content between ```
+      content <- gsub("```\\{?r?\\}?\\s*\\n?", "", blocks)
+      content <- gsub("```\\s*$", "", content)
+      return(paste(content, collapse = "\n\n"))
+    }
+    # Generic code blocks
+    blocks <- regmatches(text, gregexpr("```\\w*\\s*\\n([\\s\\S]*?)```", text, perl = TRUE))[[1]]
+    if (length(blocks) > 0) {
+      content <- gsub("```\\w*\\s*\\n", "", blocks)
+      content <- gsub("```\\s*$", "", content)
+      return(paste(content, collapse = "\n\n"))
+    }
+    # Just strip all ``` markers
+    text <- gsub("```\\w*\\s*\\n?", "", text)
+    text <- gsub("```", "", text)
+  }
+  trimws(text)
 }
