@@ -1,11 +1,11 @@
-# rair — AI for R
+# raix — AI for R
 
-[![R CMD Check](https://github.com/twomathematicians-code/rair/actions/workflows/ci.yml/badge.svg)](https://github.com/twomathematicians-code/rair/actions)
+[![R CMD Check](https://github.com/twomathematicians-code/raix/actions/workflows/ci.yml/badge.svg)](https://github.com/twomathematicians-code/raix/actions)
 [![R Package](https://img.shields.io/badge/R-Package-276DC3?logo=r)](https://www.r-project.org/)
-[![Version](https://img.shields.io/badge/version-0.4.0-blue)](https://github.com/twomathematicians-code/rair)
+[![Version](https://img.shields.io/badge/version-0.4.0-blue)](https://github.com/twomathematicians-code/raix)
 [![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
-[![Backends](https://img.shields.io/badge/backends-6-6366f1)](https://github.com/twomathematicians-code/rair#-supported-backends)
-[![Tests](https://img.shields.io/badge/tests-29%20passing-success)](https://github.com/twomathematicians-code/rair/actions)
+[![Backends](https://img.shields.io/badge/backends-6-6366f1)](https://github.com/twomathematicians-code/raix#-supported-backends)
+[![Tests](https://img.shields.io/badge/tests-29%20passing-success)](https://github.com/twomathematicians-code/raix/actions)
 
 > **AI-powered coding assistant for R — built for beginners, powerful for experts.**
 > Chat, explain, debug, generate code, analyze data, search packages, and more — without leaving RStudio.
@@ -51,7 +51,7 @@ graph TB
 
 ```r
 # Install
-remotes::install_github("twomathematicians-code/rair")
+remotes::install_github("twomathematicians-code/raix")
 
 # Option 1: GUI Chat (like ZCode)
 library(air)
