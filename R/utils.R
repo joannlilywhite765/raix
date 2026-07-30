@@ -105,57 +105,60 @@ air_search <- function(topic, n = 10) {
   if (missing(topic) || !is.character(topic) || nchar(trimws(topic)) == 0) {
     stop("topic must be a non-empty string (e.g., 'clustering', 'plotting')")
   }
-  cli::cli_alert_info("Searching CRAN for packages related to '{topic}'...")
+  cli::cli_alert_info("Searching for R packages: '{topic}'...")
 
-  # Use available.packages() for offline search, or CRAN web API
-  pkgs <- tryCatch({
-    utils::available.packages(repos = "https://cran.rstudio.com/src/contrib", filters = list())
-  }, error = function(e) NULL)
-
-  if (is.null(pkgs)) {
-    # Fallback: use AI to suggest packages
-    prompt <- paste0(
-      "A user is looking for R packages related to: ", topic, ". ",
-      "Suggest the top 5 most popular and well-maintained CRAN packages. ",
-      "For each, give: PackageName — short description. ",
-      "Output format: package_name: description"
-    )
-    cli::cli_alert_info("Using AI to find packages...")
-    result <- tryCatch(air_send(prompt), error = function(e) NULL)
-    if (!is.null(result)) {
-      cat("\n", cli::col_green("AI suggestions:"), "\n")
-      cat(result, "\n")
-      return(invisible(result))
-    }
-    stop("Could not search CRAN. Please check your internet connection.")
-  }
-
-  # Search package names and titles
-  scores <- apply(pkgs, 1, function(row) {
-    text <- paste(tolower(row["Package"]), tolower(row["Title"]))
-    sum(sapply(strsplit(tolower(topic), "\\s+")[[1]], function(w) grepl(w, text)))
-  })
-  top <- head(order(scores, decreasing = TRUE), n)
-  result <- data.frame(
-    Package = pkgs[top, "Package"],
-    Title = substr(pkgs[top, "Title"], 1, 80),
-    Version = pkgs[top, "Version"],
-    row.names = NULL, stringsAsFactors = FALSE
+  # Try CRAN available.packages
+  pkgs <- tryCatch(
+    suppressWarnings(utils::available.packages(
+      repos = "https://cran.rstudio.com/src/contrib", filters = list()
+    )),
+    error = function(e) NULL
   )
 
-  if (sum(scores[top]) == 0) {
-    cli::cli_alert_warning("No direct matches found. Trying AI suggestion...")
-    prompt <- paste0("Suggest R packages for: ", topic, ". Output: package_name: description")
-    result <- tryCatch(air_send(prompt), error = function(e) NULL)
-    if (!is.null(result)) cat(result, "\n")
-  } else {
-    cat("\n")
-    cli::cli_h3("CRAN packages matching '{topic}':")
-    for (i in seq_len(nrow(result))) {
-      cli::cli_bullets(c("*" = "{.pkg {result$Package[i]}} — {result$Title[i]}"))
+  if (!is.null(pkgs) && is.matrix(pkgs) && nrow(pkgs) > 0) {
+    # Search in Package and Title columns
+    scores <- tryCatch({
+      apply(pkgs, 1, function(row) {
+        text <- paste(tolower(row["Package"]), tolower(row["Title"]))
+        sum(sapply(strsplit(tolower(topic), "\\s+")[[1]], function(w) grepl(w, text, fixed = TRUE)))
+      })
+    }, error = function(e) NULL)
+
+    if (!is.null(scores) && length(scores) > 0) {
+      top <- head(order(scores, decreasing = TRUE), min(n, length(scores)))
+      if (length(top) > 0 && max(top) <= nrow(pkgs)) {
+        result <- data.frame(
+          Package = pkgs[top, "Package"],
+          Title = substr(pkgs[top, "Title"], 1, 80),
+          Version = pkgs[top, "Version"],
+          row.names = NULL, stringsAsFactors = FALSE
+        )
+        if (sum(scores[top]) > 0) {
+          cat("\n"); cli::cli_h3("CRAN packages matching '{topic}':")
+          for (i in seq_len(nrow(result))) {
+            cli::cli_bullets(c("*" = "{.pkg {result$Package[i]}} — {result$Title[i]}"))
+          }
+          return(invisible(result))
+        }
+      }
     }
   }
-  invisible(result)
+
+  # Fallback: AI-powered package suggestion
+  cli::cli_alert_info("Using AI to suggest packages...")
+  prompt <- paste0(
+    "A user needs R packages for: ", topic, ". ",
+    "Suggest the top 5 most popular CRAN packages. ",
+    "Output format: package_name — short description."
+  )
+  result <- tryCatch(air_send(prompt), error = function(e) NULL)
+  if (!is.null(result)) {
+    cat("\n", cli::col_green("AI suggestions for '{topic}':"), "\n")
+    cat(result, "\n")
+    return(invisible(result))
+  }
+  cli::cli_alert_warning("Could not search packages. Check internet or AI backend.")
+  invisible(NULL)
 }
 
 #' Diagnose issues in an R script or project
