@@ -1,10 +1,13 @@
 # AIR RStudio Add-in — Quick Chat
 #
-# Adds an RStudio Add-in that opens a chat session
-# Install: copy this file to inst/rstudio/addins.dcf
+# Adds an RStudio Add-in that opens the AIR GUI directly
 
 air_addin_chat <- function() {
-  air_configure(backend = getOption("air.backend", "ollama"),
+  air_configure(provider = getOption("air.provider", "ollama"),
                 model = getOption("air.model", "llama3.2"))
-  air_chat()
+  if (requireNamespace("shiny", quietly = TRUE)) {
+    air_gui()
+  } else {
+    air_chat()
+  }
 }

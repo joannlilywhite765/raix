@@ -2,3 +2,5 @@
 ^\.github$
 ^README\.md$
 ^LICENSE$
+^test_.*\.R$
+^test_.*
