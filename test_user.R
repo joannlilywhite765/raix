@@ -5,10 +5,10 @@ install.packages(".", repos = NULL, type = "source", quiet = TRUE)
 cat("OK\n")
 
 cat("2. Load...")
-library(air)
+library(raix)
 cat("OK\n")
 
-cat("3. Exported functions:", paste(ls("package:air"), collapse = ", "), "\n")
+cat("3. Exported functions:", paste(ls("package:raix"), collapse = ", "), "\n")
 
 cat("4. Configure ollama...")
 air_configure(backend = "ollama")
@@ -42,6 +42,6 @@ cat("11. air_check (dead port): ")
 r <- tryCatch(air_check(), error = function(e) "CAUGHT")
 cat(r, "\n")
 
-cat("12. Version:", as.character(packageVersion("air")), "\n")
+cat("12. Version:", as.character(packageVersion("raix")), "\n")
 
 cat("\n=== 0 crashes, 0 unexpected failures ===\n")

@@ -2,7 +2,7 @@
 # v0.4.1 — Fixed Enter-to-send, error handling, responsive layout
 
 library(shiny)
-library(air)
+library(raix)
 
 ui <- fluidPage(
   tags$head(tags$style(HTML("

@@ -11,16 +11,16 @@ cat("1.1 install.packages from source... ")
 install.packages(".", repos = NULL, type = "source", quiet = TRUE)
 cat("OK\n")
 
-cat("1.2 library(air)... ")
-suppressPackageStartupMessages(library(air))
+cat("1.2 library(raix)... ")
+suppressPackageStartupMessages(library(raix))
 cat("OK\n")
 
 cat("1.3 Check version... ")
-v <- as.character(packageVersion("air"))
+v <- as.character(packageVersion("raix"))
 cat(v, "\n")
 
 cat("1.4 List exported functions... ")
-fns <- ls("package:air")
+fns <- ls("package:raix")
 cat(length(fns), "functions:", paste(fns, collapse=", "), "\n")
 
 # ── Configuration ─────────────────────────────────────────────────

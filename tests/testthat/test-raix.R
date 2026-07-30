@@ -3,7 +3,7 @@ library(testthat)
 if (requireNamespace("pkgload", quietly = TRUE)) {
   pkgload::load_all(".", quiet = TRUE)
 } else {
-  library(air)
+  library(raix)
 }
 
 # ── Configuration tests (no network needed) ──────────────────────────

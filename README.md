@@ -54,7 +54,7 @@ graph TB
 remotes::install_github("twomathematicians-code/raix")
 
 # Option 1: GUI Chat (like ZCode)
-library(air)
+library(raix)
 air_gui()                  # ← Opens chat window in RStudio Viewer
 
 # Option 2: Guided setup
@@ -116,7 +116,7 @@ air_chat()                 # ← Chat in your R console
 ## 🧪 Run a Full Demo
 
 ```r
-library(air)
+library(raix)
 
 # 1. Setup
 air_setup()

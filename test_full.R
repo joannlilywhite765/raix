@@ -1,7 +1,7 @@
 cat("\n=== FULL USER SIMULATION ===\n\n")
 
 install.packages(".", repos = NULL, type = "source", quiet = TRUE)
-library(air)
+library(raix)
 
 steps <- 0; fails <- 0
 

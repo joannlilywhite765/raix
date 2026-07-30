@@ -2,7 +2,7 @@ cat("\n=== BUG HUNT: EDGE CASES ===\n\n")
 
 # Reinstall and reload
 install.packages(".", repos = NULL, type = "source", quiet = TRUE)
-library(air)
+library(raix)
 
 bugs <- 0; ok <- 0
 
@@ -26,14 +26,14 @@ if (r == "ERR") bugs <- bugs + 1 else ok <- ok + 1
 # Bug 4: Switch backend mid-session
 cat("4. Backend switch: ")
 air_configure(backend = "ollama", model = "llama3.2")
-b1 <- get("backend", envir = asNamespace("air")[["air_env"]])
+b1 <- get("backend", envir = asNamespace("raix")[["air_env"]])
 air_configure(backend = "openai", model = "gpt-4o")
-b2 <- get("backend", envir = asNamespace("air")[["air_env"]])
+b2 <- get("backend", envir = asNamespace("raix")[["air_env"]])
 if (b1 == "ollama" && b2 == "openai") { ok <- ok + 1; cat("OK\n") } else { bugs <- bugs + 1; cat("BUG\n") }
 
 # Bug 5: Chat history persists
 cat("5. History: ")
-env <- asNamespace("air")[["air_env"]]
+env <- asNamespace("raix")[["air_env"]]
 env$chat_history <- list(list(role = "user", content = "old"))
 air_configure(backend = "openai")
 if (length(env$chat_history) > 0) { ok <- ok + 1; cat("OK\n") } else { bugs <- bugs + 1; cat("BUG\n") }
@@ -48,8 +48,8 @@ if (r == "CAUGHT") { ok <- ok + 1; cat("OK\n") } else { bugs <- bugs + 1; cat("B
 cat("7. Re-entrant config: ")
 air_configure(backend = "claude", temperature = 0.3)
 air_configure(backend = "deepseek", max_tokens = 100)
-t <- get("temperature", envir = asNamespace("air")[["air_env"]])
-mt <- get("max_tokens", envir = asNamespace("air")[["air_env"]])
+t <- get("temperature", envir = asNamespace("raix")[["air_env"]])
+mt <- get("max_tokens", envir = asNamespace("raix")[["air_env"]])
 if (t == 0.3 && mt == 100) { ok <- ok + 1; cat("OK\n") } else { bugs <- bugs + 1; cat("BUG\n") }
 
 # Bug 8: air_explain with bad input  

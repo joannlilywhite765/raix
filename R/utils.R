@@ -381,7 +381,7 @@ air_rstudio <- function(mode = c("pane", "source", "console")) {
     rstudioapi::viewer(temp)
   } else if (mode == "source") {
     cli::cli_alert_info("Opening AIR setup script in Source editor...")
-    rstudioapi::navigateToFile(system.file("R/air.R", package = "air"))
+    rstudioapi::navigateToFile(system.file("R/air.R", package = "raix"))
   } else {
     cli::cli_alert_info("AIR is ready! Type {.code air_help()} to see all commands.")
   }

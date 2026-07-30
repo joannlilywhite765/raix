@@ -8,7 +8,7 @@ air_gui <- function() {
   if (!requireNamespace("shiny", quietly = TRUE)) {
     stop("Package 'shiny' is required. Install with: install.packages('shiny')")
   }
-  app_path <- system.file("shiny", "app.R", package = "air")
+  app_path <- system.file("shiny", "app.R", package = "raix")
   if (app_path == "") stop("Shiny app not found in package installation")
 
   if (requireNamespace("rstudioapi", quietly = TRUE) && rstudioapi::isAvailable()) {

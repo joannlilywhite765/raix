@@ -1,8 +1,8 @@
 cat("\n=== ANY-MODEL TEST ===\n\n")
-install.packages(".", repos=NULL, type="source", quiet=TRUE); library(air)
+install.packages(".", repos=NULL, type="source", quiet=TRUE); library(raix)
 ok <- 0; bad <- 0
 
-env <- asNamespace("air")[["air_env"]]
+env <- asNamespace("raix")[["air_env"]]
 
 # Test 1: Preset providers
 cat("1. Presets: ")
