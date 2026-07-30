@@ -91,6 +91,11 @@ air_configure <- function(backend = c("openai", "ollama", "claude", "deepseek", 
 #' @return The AI's response as a character string
 #' @export
 air_send <- function(prompt, context = NULL, stream = FALSE) {
+  # Input validation
+  if (missing(prompt) || is.null(prompt) || is.na(prompt) ||
+      !is.character(prompt) || nchar(trimws(prompt)) == 0) {
+    stop("prompt must be a non-empty character string")
+  }
   if (!is.null(context)) {
     prompt <- paste0("Context:\n```r\n", context, "\n```\n\nUser: ", prompt)
   }
@@ -126,6 +131,9 @@ air_send <- function(prompt, context = NULL, stream = FALSE) {
 #' @return Human-readable explanation
 #' @export
 air_explain <- function(code) {
+  if (missing(code) || is.null(code) || is.na(code) || !is.character(code) || nchar(trimws(code)) == 0) {
+    stop("code must be a non-empty character string (an R expression or function name)")
+  }
   if (exists(code, mode = "function")) {
     code <- paste(deparse(get(code)), collapse = "\n")
   }
@@ -164,6 +172,9 @@ air_debug <- function(error_msg = NULL) {
 #' @return roxygen2 documentation block
 #' @export
 air_document <- function(code, func_name = NULL) {
+  if (missing(code) || is.null(code) || is.na(code) || !is.character(code) || nchar(trimws(code)) == 0) {
+    stop("code must be a non-empty character string containing an R function")
+  }
   prompt <- paste0(
     "Generate roxygen2 documentation for this R function. Include @param, @return, @examples, and @export if appropriate.\n\n",
     "```r\n", code, "\n```\n\n",
@@ -180,6 +191,10 @@ air_document <- function(code, func_name = NULL) {
 #' @return Generated R code
 #' @export
 air_generate <- function(description, context = NULL) {
+  if (missing(description) || is.null(description) || is.na(description) ||
+      !is.character(description) || nchar(trimws(description)) == 0) {
+    stop("description must be a non-empty character string")
+  }
   prompt <- paste0(
     "Write R code to accomplish this task. Use best practices (error handling, type checking). ",
     "Output ONLY the R code, no explanation.\n\nTask: ", description
