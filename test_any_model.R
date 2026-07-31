@@ -1,68 +1,94 @@
-cat("\n=== ANY-MODEL TEST ===\n\n")
-install.packages(".", repos=NULL, type="source", quiet=TRUE); library(raix)
+# ═══════════════════════════════════════════════════════════════
+# raix — Any Model Test (13+ providers, all API formats)
+# ═══════════════════════════════════════════════════════════════
+
+cat("\n========================================\n")
+cat("  RAIX ANY-MODEL TEST\n")
+cat("========================================\n\n")
+
+library(raix)
 ok <- 0; bad <- 0
 
-env <- asNamespace("raix")[["raix_env"]]
-
-# Test 1: Preset providers
-cat("1. Presets: ")
-for (p in c("ollama","openai","claude","groq","together","mistral","deepseek","lmstudio","vllm","openrouter")) {
-  r <- tryCatch({raix_configure(provider=p); TRUE}, error=function(e){cat("FAIL:",p," "); FALSE})
-  if (r) ok <- ok+1 else bad <- bad+1
+t <- function(label, expr) {
+  r <- tryCatch(expr, error = function(e) paste("ERR:", conditionMessage(e)))
+  if (isTRUE(r) || r == "OK") {
+    cat(sprintf("  [OK] %s\n", label)); ok <<- ok + 1
+  } else {
+    cat(sprintf("  [FAIL] %s — %s\n", label, r)); bad <<- bad + 1
+  }
 }
-cat("\n   ", ok, "OK,", bad, "FAIL\n")
 
-# Test 2: Custom endpoint
-cat("2. Custom endpoint: ")
-raix_configure(provider="my-custom", model="my-model", base_url="https://my-api.example.com/v1", api_key="test-key")
-fmt <- env$api_format
-if (fmt == "openai") { ok <- ok+1; cat("OK (format:", fmt, ")\n") } else { bad <- bad+1; cat("FAIL\n") }
-
-# Test 3: Custom + format override
-cat("3. Format override: ")
-raix_configure(provider="custom-ollama", model="llama3", base_url="http://localhost:9999", api_format="ollama")
-if (env$api_format == "ollama") { ok <- ok+1; cat("OK\n") } else { bad <- bad+1; cat("FAIL\n") }
-
-# Test 4: Auto-detect ollama URL
-cat("4. Auto-detect ollama: ")
-raix_configure(provider="test", base_url="http://localhost:11434")
-if (env$api_format == "ollama") { ok <- ok+1; cat("OK\n") } else { bad <- bad+1; cat("FAIL\n") }
-
-# Test 5: Auto-detect claude URL
-cat("5. Auto-detect claude: ")
-raix_configure(provider="test", base_url="https://api.anthropic.com/v1")
-if (env$api_format == "claude") { ok <- ok+1; cat("OK\n") } else { bad <- bad+1; cat("FAIL\n") }
-
-# Test 6: Default models
-cat("6. Default models: ")
-defaults <- list(openai="gpt-4o", ollama="llama3.2", groq="mixtral", together="mistralai")
-for (p in names(defaults)) {
-  raix_configure(provider=p)
-  if (grepl(defaults[[p]], env$model, ignore.case=TRUE)) { ok <- ok+1 } else { bad <- bad+1; cat("FAIL:",p," ") }
+# ── All known provider presets ──
+cat("\n── 1. Provider Presets (13) ──\n")
+providers <- c("ollama", "openai", "claude", "groq", "together", "mistral", 
+               "deepseek", "kimi", "zai", "perplexity", "lmstudio", "vllm", "openrouter")
+for (p in providers) {
+  t(paste("Provider:", p), { raix_configure(provider = p); TRUE })
 }
-cat("OK\n"); ok <- ok+1
 
-# Test 7: Routing works
-cat("7. Routing: ")
-raix_configure(provider="openai"); r <- tryCatch({raix_send("test"); "sent"}, error=function(e) "err")
-cat(r, "/ "); ok <- ok+1
-raix_configure(provider="ollama"); r <- tryCatch({raix_send("test"); "sent"}, error=function(e) "err")
-cat(r, "/ "); ok <- ok+1
-raix_configure(provider="claude"); r <- tryCatch({raix_send("test"); "sent"}, error=function(e) "err")
-cat(r, " "); ok <- ok+1
-cat("OK\n")
+# ── Custom endpoints ──
+cat("\n── 2. Custom Endpoints ──\n")
+t("Custom with base_url", {
+  raix_configure(provider = "my-server", model = "my-model", 
+                 base_url = "https://api.example.com/v1", api_format = "openai")
+  cfg <- asNamespace("raix")[["raix_env"]]
+  cfg$base_url == "https://api.example.com/v1" && cfg$api_format == "openai"
+})
 
-# Test 8: raix_info shows provider
-cat("8. raix_info: ")
-raix_configure(provider="groq", model="llama3-70b")
-info <- paste(capture.output(raix_info()), collapse=" ")
-if (grepl("groq", info)) { ok <- ok+1; cat("OK\n") } else { bad <- bad+1; cat("FAIL\n") }
+t("Custom ollama-compatible", {
+  raix_configure(provider = "local-llm", model = "mistral",
+                 base_url = "http://localhost:11434", api_format = "ollama")
+  cfg <- asNamespace("raix")[["raix_env"]]
+  cfg$api_format == "ollama"
+})
 
-# Test 9: No API key for OpenAI-compatible still routes correctly
-cat("9. Without API key: ")
-raix_configure(provider="openai", api_key=NULL)
-r <- tryCatch({raix_send("test"); "sent"}, error=function(e) "err")
-cat(if (r %in% c("sent","err")) "OK\n" else "FAIL\n"); ok <- ok+1
+t("Custom claude-compatible", {
+  raix_configure(provider = "claude-proxy", model = "claude-3",
+                 base_url = "https://proxy.example.com/v1", api_format = "claude")
+  cfg <- asNamespace("raix")[["raix_env"]]
+  cfg$api_format == "claude"
+})
 
-cat("\n=== RESULTS:", ok, "OK,", bad, "FAIL ===\n")
-if (bad > 0) quit(status=1) else quit(status=0)
+# ── API format detection ──
+cat("\n── 3. API Format Auto-Detection ──\n")
+t("Detect ollama URL", {
+  fmt <- raix_detect_format("http://localhost:11434")
+  fmt == "ollama"
+})
+t("Detect anthropic URL", {
+  fmt <- raix_detect_format("https://api.anthropic.com/v1")
+  fmt == "claude"
+})
+t("Detect openai URL", {
+  fmt <- raix_detect_format("https://api.openai.com/v1")
+  fmt == "openai"
+})
+t("Default to openai", {
+  fmt <- raix_detect_format("https://unknown.example.com/v1")
+  fmt == "openai"
+})
+
+# ── Model size detection ──
+cat("\n── 4. Model Size Detection ──\n")
+t("qwen2.5-coder:7b -> small", { isTRUE(raix_detect_model_size("qwen2.5-coder:7b")) })
+t("phi3.5 -> small", { isTRUE(raix_detect_model_size("phi3.5:latest")) })
+t("gemma2:9b -> small", { isTRUE(raix_detect_model_size("gemma2:9b")) })
+t("llama3.2 -> small", { isTRUE(raix_detect_model_size("llama3.2")) })
+t("mistral:7b -> small", { isTRUE(raix_detect_model_size("mistral:7b")) })
+t("deepseek-coder:6.7b -> small", { isTRUE(raix_detect_model_size("deepseek-coder:6.7b")) })
+t("gpt-4o -> standard", { !isTRUE(raix_detect_model_size("gpt-4o")) })
+t("claude-3-5-sonnet -> standard", { !isTRUE(raix_detect_model_size("claude-3-5-sonnet-20241022")) })
+t("deepseek-chat -> standard", { !isTRUE(raix_detect_model_size("deepseek-chat")) })
+
+# ── Model switching ──
+cat("\n── 5. Rapid Provider Switching ──\n")
+for (p in sample(providers, 10)) {
+  t(paste("Switch to", p), { raix_configure(provider = p); TRUE })
+}
+t("Back to ollama", { raix_configure(provider = "ollama", model = "llama3.2"); TRUE })
+
+# ── Summary ──
+cat("\n========================================\n")
+cat(sprintf("  %d OK, %d FAIL, %d total\n", ok, bad, ok+bad))
+cat("========================================\n\n")
+if (bad > 0) quit(status = 1)

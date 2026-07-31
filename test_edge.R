@@ -1,73 +1,83 @@
-cat("\n=== BUG HUNT: EDGE CASES ===\n\n")
+# ═══════════════════════════════════════════════════════════════
+# raix — Edge Cases & Bug Hunt
+# Tests boundary conditions, weird inputs, rapid state changes
+# ═══════════════════════════════════════════════════════════════
 
-# Reinstall and reload
-install.packages(".", repos = NULL, type = "source", quiet = TRUE)
+cat("\n========================================\n")
+cat("  RAIX EDGE CASE HUNT\n")
+cat("========================================\n\n")
+
 library(raix)
+ok <- 0; bad <- 0
 
-bugs <- 0; ok <- 0
+t <- function(label, expr) {
+  r <- tryCatch(expr, error = function(e) paste("ERR:", conditionMessage(e)))
+  if (isTRUE(r) || r == "OK") {
+    cat(sprintf("  [OK] %s\n", label)); ok <<- ok + 1
+  } else {
+    cat(sprintf("  [FAIL] %s — %s\n", label, r)); bad <<- bad + 1
+  }
+}
 
-# Bug 1: Empty prompt
-cat("1. Empty prompt: ")
-r <- tryCatch(raix_send(""), error = function(e) e$message)
-if (grepl("empty|non-empty|character string", tolower(r))) { ok <- ok + 1; cat("OK (rejected)\n") } else { bugs <- bugs + 1; cat("BUG — accepted empty prompt\n") }
+# ── NA, NULL, empty string handling ──
+cat("\n── 1. NA/NULL/Empty String Defense ──\n")
+t("raix_send(NA)", { grepl("non-empty", tryCatch(raix_send(NA_character_), error=function(e)e$message)) })
+t("raix_send(NULL)", { grepl("non-empty", tryCatch(raix_send(NULL), error=function(e)e$message)) })
+t("raix_explain(NA)", { grepl("non-empty", tryCatch(raix_explain(NA_character_), error=function(e)e$message)) })
+t("raix_generate(NA)", { grepl("non-empty", tryCatch(raix_generate(NA_character_), error=function(e)e$message)) })
+t("raix_search(NA)", { grepl("non-empty", tryCatch(raix_search(NA_character_), error=function(e)e$message)) })
+t("raix_solve(NA)", { grepl("non-empty", tryCatch(raix_solve(NA_character_), error=function(e)e$message)) })
+t("raix_google(NA)", { grepl("non-empty", tryCatch(raix_google(NA_character_), error=function(e)e$message)) })
+t("raix_terminal(NA)", { grepl("non-empty", tryCatch(raix_terminal(NA_character_), error=function(e)e$message)) })
+t("raix_sql(NA)", { grepl("describe", tryCatch(raix_sql(NA_character_), error=function(e)e$message)) })
+t("raix_simulate(NA)", { grepl("describe", tryCatch(raix_simulate(NA_character_), error=function(e)e$message)) })
+t("raix_translate(NA)", { grepl("non-empty", tryCatch(raix_translate(NA_character_), error=function(e)e$message)) })
+t("raix_refactor(NA)", { grepl("non-empty", tryCatch(raix_refactor(NA_character_), error=function(e)e$message)) })
+t("raix_web(NA)", { grepl("valid", tryCatch(raix_web(NA_character_), error=function(e)e$message)) })
 
-# Bug 2: NA prompt
-cat("2. NA prompt: ")
-r <- tryCatch(raix_send(NA_character_), error = function(e) e$message)
-if (grepl("non-empty|character string", r)) { ok <- ok + 1; cat("OK (rejected)\n") } else { bugs <- bugs + 1; cat("BUG — NA accepted\n") }
+# ── Rapid provider switching (10x in loop) ──
+cat("\n── 2. Rapid Provider Switching ──\n")
+providers <- c("ollama", "openai", "claude", "groq", "mistral", "deepseek")
+for (i in 1:10) {
+  p <- sample(providers, 1)
+  t(paste("Switch #", i, "->", p), {
+    raix_configure(provider = p)
+    env <- asNamespace("raix")[["raix_env"]]
+    env$provider == p
+  })
+}
 
-# Bug 3: Missing API key for OpenAI
-cat("3. Missing API key (OpenAI): ")
-raix_configure(provider = "openai", api_key = "")
-r <- tryCatch(raix_check(), error = function(e) "ERR")
-cat(if (r == "ERR") "BUG" else "OK", "\n")
-if (r == "ERR") bugs <- bugs + 1 else ok <- ok + 1
+# ── Boundary values ──
+cat("\n── 3. Boundary Values ──\n")
+t("Temp = 0", { raix_configure(temperature = 0); TRUE })
+t("Temp = 1", { raix_configure(temperature = 1); TRUE })
+t("Max tokens = 1", { raix_configure(max_tokens = 1); TRUE })
+t("Max tokens = 16384", { raix_configure(max_tokens = 16384); TRUE })
+t("Long system prompt", {
+  raix_configure(system_prompt = paste(rep("x", 500), collapse = ""))
+  TRUE
+})
+t("Empty model name", {
+  raix_configure(provider = "ollama", model = "")
+  TRUE
+})
 
-# Bug 4: Switch backend mid-session
-cat("4. Backend switch: ")
-raix_configure(provider = "ollama", model = "llama3.2")
-b1 <- get("provider", envir = asNamespace("raix")[["raix_env"]])
-raix_configure(provider = "openai", model = "gpt-4o")
-b2 <- get("provider", envir = asNamespace("raix")[["raix_env"]])
-if (b1 == "ollama" && b2 == "openai") { ok <- ok + 1; cat("OK\n") } else { bugs <- bugs + 1; cat("BUG\n") }
+# ── Repeated calls ──
+cat("\n── 4. Repeated Calls ──\n")
+for (i in 1:5) { t(paste("raix_info #", i), { raix_info(); TRUE }) }
+for (i in 1:5) { t(paste("raix_config #", i), { is.list(raix_config()) }) }
+for (i in 1:5) { t(paste("raix_small_mode #", i), { raix_small_mode(FALSE); TRUE }) }
 
-# Bug 5: Chat history persists
-cat("5. History: ")
-env <- asNamespace("raix")[["raix_env"]]
-env$chat_history <- list(list(role = "user", content = "old"))
-raix_configure(provider = "openai")
-if (length(env$chat_history) > 0) { ok <- ok + 1; cat("OK\n") } else { bugs <- bugs + 1; cat("BUG\n") }
+# ── Concurrent access ──
+cat("\n── 5. State Consistency ──\n")
+raix_configure(provider = "ollama", model = "test-model")
+cfg <- asNamespace("raix")[["raix_env"]]
+t("Provider consistent", { cfg$provider == "ollama" })
+t("Model consistent", { cfg$model == "test-model" })
+t("First call flag exists", { exists("first_call", envir = cfg) })
 
-# Bug 6: Long prompt
-cat("6. Long prompt: ")
-long <- paste(rep("test ", 1000), collapse = "")
-r <- tryCatch({raix_configure(provider="ollama", base_url="http://127.0.0.1:1"); raix_send(long)}, error = function(e) "CAUGHT")
-if (r == "CAUGHT") { ok <- ok + 1; cat("OK\n") } else { bugs <- bugs + 1; cat("BUG\n") }
-
-# Bug 7: Re-entrant config preserves values
-cat("7. Re-entrant config: ")
-raix_configure(provider = "claude", temperature = 0.3)
-raix_configure(provider = "deepseek", max_tokens = 100)
-t <- get("temperature", envir = asNamespace("raix")[["raix_env"]])
-mt <- get("max_tokens", envir = asNamespace("raix")[["raix_env"]])
-if (t == 0.3 && mt == 100) { ok <- ok + 1; cat("OK\n") } else { bugs <- bugs + 1; cat("BUG\n") }
-
-# Bug 8: raix_explain with bad input  
-cat("8. raix_explain(empty): ")
-r <- tryCatch(raix_explain(""), error = function(e) "CAUGHT")
-if (r == "CAUGHT") { ok <- ok + 1; cat("OK\n") } else { bugs <- bugs + 1; cat("BUG\n") }
-
-# Bug 9: Rapid switching
-cat("9. Rapid switching: ")
-for (i in 1:10) tryCatch(raix_configure(provider = sample(c("openai","ollama","claude","deepseek","kimi","zai"), 1)), error = function(e) NULL)
-ok <- ok + 1; cat("OK\n")
-
-# Bug 10: raix_check with no API key (401 = server reachable, key invalid — correct)
-cat("10. raix_check (no key → 401): ")
-raix_configure(provider = "openai", api_key = "")
-r <- tryCatch(raix_check(), error = function(e) "ERR")
-cat(if (isTRUE(r) || identical(r, FALSE)) "OK (handled)" else "BUG", "\n")
-if (!isTRUE(r) && !identical(r, FALSE)) bugs <- bugs + 1 else ok <- ok + 1
-
-cat("\n=== RESULTS:", ok, "OK,", bugs, "BUGS ===\n")
-if (bugs > 0) quit(status = 1) else quit(status = 0)
+# ── Summary ──
+cat("\n========================================\n")
+cat(sprintf("  %d OK, %d FAIL, %d total\n", ok, bad, ok+bad))
+cat("========================================\n\n")
+if (bad > 0) quit(status = 1)

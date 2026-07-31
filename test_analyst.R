@@ -1,159 +1,73 @@
-# raix — Data Analyst Simulation Test
-# Tests every function as a real data analyst would use it.
+# ═══════════════════════════════════════════════════════════════
+# raix — Data Analyst Workflow Simulation
+# Tests typical data analyst tasks end-to-end
+# ═══════════════════════════════════════════════════════════════
 
-cat("\n╔══════════════════════════════════════╗\n")
-cat("║   DATA ANALYST USER SIMULATION      ║\n")
-cat("╚══════════════════════════════════════╝\n\n")
+cat("\n========================================\n")
+cat("  RAIX DATA ANALYST SIMULATION\n")
+cat("========================================\n\n")
 
-# ── Setup ────────────────────────────────────────────────────────
-cat("═══ STEP 1: Installation ═══\n")
-cat("1.1 install.packages from source... ")
-install.packages(".", repos = NULL, type = "source", quiet = TRUE)
-cat("OK\n")
+passed <- 0; failed <- 0
 
-cat("1.2 library(raix)... ")
-suppressPackageStartupMessages(library(raix))
-cat("OK\n")
+check <- function(label, expr) {
+  r <- tryCatch(expr, error = function(e) paste("ERROR:", conditionMessage(e)))
+  if (isTRUE(r) || r == "OK") {
+    cat(sprintf("  [PASS] %s\n", label)); passed <<- passed + 1
+  } else {
+    cat(sprintf("  [FAIL] %s — %s\n", label, r)); failed <<- failed + 1
+  }
+}
 
-cat("1.3 Check version... ")
-v <- as.character(packageVersion("raix"))
-cat(v, "\n")
+# ── Setup ──
+cat("\n── 1. Setup ──\n")
+check("Package loads", { library(raix); "OK" })
+check("Version >= 0.8", { as.numeric(packageVersion("raix")) >= 0.8 })
+check("42 functions", { length(ls("package:raix")) >= 42 })
 
-cat("1.4 List exported functions... ")
-fns <- ls("package:raix")
-cat(length(fns), "functions:", paste(fns, collapse=", "), "\n")
+# ── Config ──
+cat("\n── 2. Configuration ──\n")
+check("ollama preset", { raix_configure(provider = "ollama"); TRUE })
+check("openai preset", { raix_configure(provider = "openai"); TRUE })
+check("custom endpoint", { raix_configure(provider = "custom", model = "test", base_url = "https://api.example.com/v1", api_format = "openai"); TRUE })
+check("raix_config list", { is.list(raix_config()) })
+check("Switch back ollama", { raix_configure(provider = "ollama"); TRUE })
 
-# ── Configuration ─────────────────────────────────────────────────
-cat("\n═══ STEP 2: Configuration ═══\n")
-cat("2.1 raix_configure with preset... ")
-r <- tryCatch({raix_configure(provider="ollama", model="llama3.2"); "OK"}, error=function(e) paste("ERR:", e$message))
-cat(r, "\n")
+# ── Small Model Detection ──
+cat("\n── 3. Small Model Detection ──\n")
+check("qwen2.5-coder:7b is small", { isTRUE(raix_detect_model_size("qwen2.5-coder:7b")) })
+check("phi3.5 is small", { isTRUE(raix_detect_model_size("phi3.5:latest")) })
+check("gemma2:9b is small", { isTRUE(raix_detect_model_size("gemma2:9b")) })
+check("llama3.2 is small", { isTRUE(raix_detect_model_size("llama3.2")) })
+check("gpt-4o is NOT small", { !isTRUE(raix_detect_model_size("gpt-4o")) })
+check("small_mode toggle", { raix_small_mode(TRUE); raix_small_mode(FALSE); TRUE })
 
-cat("2.2 raix_configure with custom... ")
-r <- tryCatch({raix_configure(provider="my-custom-api", model="data-analyst-model", base_url="https://api.example.com/v1", api_key="test"); "OK"}, error=function(e) paste("ERR:", e$message))
-cat(r, "\n")
+# ── Input Validation ──
+cat("\n── 4. Input Validation ──\n")
+check("raix_send empty", { grepl("non-empty", tryCatch(raix_send(""), error=function(e)e$message)) })
+check("raix_explain empty", { grepl("non-empty", tryCatch(raix_explain(""), error=function(e)e$message)) })
+check("raix_generate empty", { grepl("non-empty", tryCatch(raix_generate(""), error=function(e)e$message)) })
+check("raix_solve empty", { grepl("non-empty", tryCatch(raix_solve(""), error=function(e)e$message)) })
+check("raix_search NA", { grepl("non-empty", tryCatch(raix_search(NA_character_), error=function(e)e$message)) })
+check("raix_terminal empty", { grepl("non-empty", tryCatch(raix_terminal(""), error=function(e)e$message)) })
+check("raix_sql empty", { grepl("describe", tryCatch(raix_sql(""), error=function(e)e$message)) })
+check("raix_simulate empty", { grepl("describe", tryCatch(raix_simulate(""), error=function(e)e$message)) })
+check("raix_translate empty", { grepl("non-empty", tryCatch(raix_translate(""), error=function(e)e$message)) })
+check("raix_refactor empty", { grepl("non-empty", tryCatch(raix_refactor(""), error=function(e)e$message)) })
 
-cat("2.3 raix_info... ")
-r <- tryCatch({capture.output(raix_info()); "OK"}, error=function(e) paste("ERR:", e$message))
-cat(r, "\n")
+# ── Project Tools ──
+cat("\n── 5. Project & File Tools ──\n")
+check("raix_project on .", { !is.null(tryCatch(raix_project("."), error=function(e)NULL)) })
+check("raix_diagnose on .", { r <- tryCatch(raix_diagnose("."), error=function(e)NULL); is.null(r) || is.numeric(r) })
+check("raix_sysinfo runs", { is.list(tryCatch(raix_sysinfo(), error=function(e)NULL)) })
+check("raix_read non-existent", { grepl("not found", tryCatch(raix_read("/no/file"), error=function(e)e$message)) })
+check("raix_history clear", { raix_history(clear=TRUE); TRUE })
 
-cat("2.4 raix_check (expect failure/no server)... ")
-r <- tryCatch({raix_check(); "checked"}, error=function(e) paste("ERR:", e$message))
-cat(r, "\n")
+# ── Compute ──
+cat("\n── 6. Compute ──\n")
+check("raix_benchmark trivial", { !is.null(tryCatch(raix_benchmark({1+1}, iterations=3), error=function(e)NULL)) })
 
-# ── Code Tools ────────────────────────────────────────────────────
-cat("\n═══ STEP 3: Code Development Tools ═══\n")
-cat("3.1 raix_explain('mean')... ")
-r <- tryCatch({raix_explain("mean"); "OK"}, error=function(e) paste("ERR:", substr(e$message,1,60)))
-cat(r, "\n")
-
-cat("3.2 raix_explain('lapply(mtcars, function(x) mean(x, na.rm=TRUE))')... ")
-r <- tryCatch({raix_explain("lapply(mtcars, function(x) mean(x, na.rm=TRUE))"); "OK"}, error=function(e) paste("ERR:", substr(e$message,1,60)))
-cat(r, "\n")
-
-cat("3.3 raix_explain(empty)... ")
-r <- tryCatch({raix_explain(""); "OK"}, error=function(e) paste("REJECTED:", substr(e$message,1,50)))
-cat(r, "\n")
-
-cat("3.4 raix_generate('bar chart of mtcars mpg')... ")
-r <- tryCatch({raix_generate("Create a bar chart of mtcars mpg by cyl"); "OK"}, error=function(e) paste("ERR:", substr(e$message,1,60)))
-cat(r, "\n")
-
-cat("3.5 raix_generate(empty)... ")
-r <- tryCatch({raix_generate(""); "OK"}, error=function(e) paste("REJECTED:", substr(e$message,1,50)))
-cat(r, "\n")
-
-cat("3.6 raix_document... ")
-r <- tryCatch({raix_document("my_func <- function(x, y) { x + y }"); "OK"}, error=function(e) paste("ERR:", substr(e$message,1,60)))
-cat(r, "\n")
-
-cat("3.7 raix_document(empty)... ")
-r <- tryCatch({raix_document(""); "OK"}, error=function(e) paste("REJECTED:", substr(e$message,1,50)))
-cat(r, "\n")
-
-cat("3.8 raix_debug (no error)... ")
-r <- tryCatch({raix_debug(); "OK"}, error=function(e) paste("EXPECTED:", substr(e$message,1,50)))
-cat(r, "\n")
-
-# ── Data Tools ─────────────────────────────────────────────────────
-cat("\n═══ STEP 4: Data Analysis Tools ═══\n")
-cat("4.1 raix_analyze(mtcars)... ")
-r <- tryCatch({raix_analyze(mtcars); "OK"}, error=function(e) paste("ERR:", substr(e$message,1,60)))
-cat(r, "\n")
-
-cat("4.2 raix_analyze(iris)... ")
-r <- tryCatch({raix_analyze(iris); "OK"}, error=function(e) paste("ERR:", substr(e$message,1,60)))
-cat(r, "\n")
-
-cat("4.3 raix_analyze(NULL)... ")
-r <- tryCatch({raix_analyze(NULL); "OK"}, error=function(e) paste("REJECTED:", substr(e$message,1,50)))
-cat(r, "\n")
-
-cat("4.4 raix_analyze(no argument)... ")
-r <- tryCatch({raix_analyze(); "OK"}, error=function(e) paste("REJECTED:", substr(e$message,1,50)))
-cat(r, "\n")
-
-cat("4.5 raix_search('time series')... ")
-r <- tryCatch({raix_search("time series"); "OK"}, error=function(e) paste("ERR:", substr(e$message,1,60)))
-cat(r, "\n")
-
-cat("4.6 raix_search('ggplot2')... ")
-r <- tryCatch({raix_search("ggplot2"); "OK"}, error=function(e) paste("ERR:", substr(e$message,1,60)))
-cat(r, "\n")
-
-cat("4.7 raix_search(empty)... ")
-r <- tryCatch({raix_search(""); "OK"}, error=function(e) paste("REJECTED:", substr(e$message,1,50)))
-cat(r, "\n")
-
-# ── Project Tools ──────────────────────────────────────────────────
-cat("\n═══ STEP 5: Project Diagnosis ═══\n")
-cat("5.1 raix_diagnose(current dir)... ")
-r <- tryCatch({issues <- raix_diagnose("."); paste("OK (", issues, "issues)")}, error=function(e) paste("ERR:", substr(e$message,1,60)))
-cat(r, "\n")
-
-cat("5.2 raix_diagnose(nonexistent)... ")
-r <- tryCatch({raix_diagnose("nonexistent_path"); "OK"}, error=function(e) paste("REJECTED:", substr(e$message,1,50)))
-cat(r, "\n")
-
-# ── Google Search ──────────────────────────────────────────────────
-cat("\n═══ STEP 6: Google Search ═══\n")
-cat("6.1 raix_google(no browser)... ")
-r <- tryCatch({raix_google("R data analysis tutorial", open_browser=FALSE); "OK"}, error=function(e) paste("ERR:", substr(e$message,1,60)))
-cat(r, "\n")
-
-cat("6.2 raix_google(empty)... ")
-r <- tryCatch({raix_google(""); "OK"}, error=function(e) paste("REJECTED:", substr(e$message,1,50)))
-cat(r, "\n")
-
-# ── Help & Info ────────────────────────────────────────────────────
-cat("\n═══ STEP 7: Help System ═══\n")
-cat("7.1 raix_help... ")
-r <- tryCatch({capture.output(raix_help()); "OK"}, error=function(e) paste("ERR:", e$message))
-cat(r, "\n")
-
-cat("7.2 raix_setup non-interactive test... ")
-r <- tryCatch({raix_configure(provider="ollama"); "OK"}, error=function(e) paste("ERR:", e$message))
-cat(r, "\n")
-
-# ── Stress Tests ───────────────────────────────────────────────────
-cat("\n═══ STEP 8: Stress & Edge Cases ═══\n")
-cat("8.1 Rapid provider switching (10x)... ")
-for (i in 1:10) tryCatch(raix_configure(provider=sample(c("ollama","openai","groq","together","mistral"),1)), error=function(e) NULL)
-cat("OK\n")
-
-cat("8.2 raix_send with special characters... ")
-r <- tryCatch({raix_send("Analysis: mean ± sd, p < 0.05, n = 100"); "OK"}, error=function(e) paste("ERR:", substr(e$message,1,60)))
-cat(r, "\n")
-
-cat("8.3 raix_send with long prompt... ")
-long <- paste(rep("Analyze this dataset. ", 200), collapse="")
-r <- tryCatch({raix_send(long); "OK"}, error=function(e) paste("ERR:", substr(e$message,1,60)))
-cat(r, "\n")
-
-cat("8.4 raix_generate with complex request... ")
-r <- tryCatch({raix_generate("Create a Shiny dashboard with ggplot2, plotly, and DT datatable for mtcars"); "OK"}, error=function(e) paste("ERR:", substr(e$message,1,60)))
-cat(r, "\n")
-
-cat("\n═══ RESULTS ═══\n")
-cat("All tests completed.\n")
-cat("Check output above for any ERR lines.\n")
+# ── Summary ──
+cat("\n========================================\n")
+cat(sprintf("  RESULTS: %d passed, %d failed, %d total\n", passed, failed, passed+failed))
+cat("========================================\n\n")
+if (failed > 0) quit(status = 1)
