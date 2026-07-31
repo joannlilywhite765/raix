@@ -19,10 +19,17 @@ Imports:
     httr,
     jsonlite,
     cli,
-    utils
+    utils,
+    tools
 Suggests:
     testthat (>= 3.0.0),
     rstudioapi,
     keyring,
-    shiny (>= 1.7.0)
+    shiny (>= 1.7.0),
+    processx,
+    reticulate,
+    Rcpp,
+    shinyAce,
+    shinythemes,
+    parallel
 Config/testthat/edition: 3

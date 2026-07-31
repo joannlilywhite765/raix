@@ -332,7 +332,7 @@ server <- function(input, output, session) {
                                 showPrintMargin = FALSE, tabSize = 2,
                                 autoComplete = "live", wordWrap = TRUE)
           } else {
-            tags$textarea(id = "code_editor", style = paste0(
+            tags$textarea(id = "code_editor_raw", style = paste0(
               "width:100%;height:100%;border:none;padding:14px;font-family:'Courier New',monospace;",
               "font-size:13px;line-height:1.5;resize:none;background:#1e1e2e;color:#cdd6f4;",
               "tab-size:2;"), code)
@@ -382,8 +382,10 @@ server <- function(input, output, session) {
   
   # Keep code in sync
   observe({
-    if (!is.null(input$code_editor)) {
+    if (has_ace && !is.null(input$code_editor)) {
       code_text(input$code_editor)
+    } else if (!is.null(input$code_editor_raw)) {
+      code_text(input$code_editor_raw)
     }
   })
   

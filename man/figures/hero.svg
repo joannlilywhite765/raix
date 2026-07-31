@@ -1,59 +1,54 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 280" width="720" height="280">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 260" width="720" height="260">
   <defs>
-    <linearGradient id="g1" x1="0%" y1="0%" x2="100%" y2="100%">
-      <stop offset="0%" style="stop-color:#1a1a2e"/>
-      <stop offset="100%" style="stop-color:#16213e"/>
-    </linearGradient>
     <linearGradient id="accent" x1="0%" y1="0%" x2="100%" y2="0%">
-      <stop offset="0%" style="stop-color:#667eea"/>
-      <stop offset="100%" style="stop-color:#a78bfa"/>
+      <stop offset="0%" style="stop-color:#1e3a5f"/>
+      <stop offset="100%" style="stop-color:#2563eb"/>
     </linearGradient>
-    <filter id="glow">
-      <feGaussianBlur stdDeviation="2" result="blur"/>
-      <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
-    </filter>
   </defs>
 
-  <rect width="720" height="280" rx="16" fill="url(#g1)"/>
+  <!-- White background -->
+  <rect width="720" height="260" rx="12" fill="#ffffff"/>
 
   <!-- Title -->
-  <text x="360" y="52" text-anchor="middle" font-family="monospace" font-size="28" font-weight="bold" fill="url(#accent)" filter="url(#glow)">raix</text>
-  <text x="360" y="74" text-anchor="middle" font-family="sans-serif" font-size="12" fill="#64748b" letter-spacing="2">R + AI + eXperience</text>
+  <text x="360" y="46" text-anchor="middle" font-family="monospace" font-size="26" font-weight="bold" fill="#1e3a5f">raix</text>
+  <text x="360" y="66" text-anchor="middle" font-family="sans-serif" font-size="11" fill="#64748b" letter-spacing="2.5">R + AI + eXperience</text>
 
-  <!-- Arrow -->
-  <text x="360" y="104" text-anchor="middle" font-size="20" fill="#334155">↓</text>
+  <!-- Flow boxes -->
+  <!-- Box 1: English -->
+  <rect x="30" y="100" width="200" height="62" rx="8" fill="#f0f4ff" stroke="#dbeafe" stroke-width="1.5"/>
+  <text x="50" y="120" font-family="monospace" font-size="8.5" fill="#2563eb" font-weight="bold" letter-spacing="1.5">DESCRIBE IN ENGLISH</text>
+  <text x="50" y="140" font-family="monospace" font-size="10.5" fill="#1e3a5f">"Create a scatter plot of</text>
+  <text x="50" y="156" font-family="monospace" font-size="10.5" fill="#1e3a5f"> mtcars colored by cyl"</text>
 
-  <!-- Flow: English → AI → R Code -->
-  <!-- Step 1: English -->
-  <rect x="40" y="124" width="200" height="56" rx="10" fill="#0f172a" stroke="#1e293b" stroke-width="1"/>
-  <text x="60" y="142" font-family="monospace" font-size="9" fill="#818cf8" letter-spacing="1.5">DESCRIBE IN ENGLISH</text>
-  <text x="60" y="164" font-family="monospace" font-size="11" fill="#e2e8f0">"Create a scatter plot</text>
-  <text x="60" y="178" font-family="monospace" font-size="11" fill="#e2e8f0"> of mtcars colored by cyl"</text>
+  <!-- Arrow 1 -->
+  <text x="242" y="135" font-family="monospace" font-size="16" fill="#94a3b8">→</text>
 
-  <!-- Arrow -->
-  <text x="252" y="156" font-size="18" fill="#334155">→</text>
+  <!-- Box 2: AI -->
+  <rect x="270" y="100" width="180" height="62" rx="8" fill="#eef2ff" stroke="#c7d2fe" stroke-width="1.5"/>
+  <text x="290" y="120" font-family="monospace" font-size="8.5" fill="#4f46e5" font-weight="bold" letter-spacing="1.5">ANY AI MODEL</text>
+  <text x="290" y="140" font-family="monospace" font-size="10.5" fill="#1e3a5f">ollama · openai</text>
+  <text x="290" y="156" font-family="monospace" font-size="10.5" fill="#1e3a5f">claude · 10+ more</text>
 
-  <!-- Step 2: AI -->
-  <rect x="280" y="124" width="160" height="56" rx="10" fill="#1e1b4b" stroke="#312e81" stroke-width="1"/>
-  <text x="300" y="142" font-family="monospace" font-size="9" fill="#a78bfa" letter-spacing="1.5">AI GENERATES</text>
-  <text x="300" y="164" font-family="monospace" font-size="11" fill="#c4b5fd">qwen2.5-coder</text>
-  <text x="300" y="178" font-family="monospace" font-size="10" fill="#8b5cf6">gpt-4o · claude · ollama</text>
+  <!-- Arrow 2 -->
+  <text x="462" y="135" font-family="monospace" font-size="16" fill="#94a3b8">→</text>
 
-  <!-- Arrow -->
-  <text x="452" y="156" font-size="18" fill="#334155">→</text>
+  <!-- Box 3: R Code -->
+  <rect x="490" y="100" width="200" height="62" rx="8" fill="#f0fdf4" stroke="#bbf7d0" stroke-width="1.5"/>
+  <text x="510" y="120" font-family="monospace" font-size="8.5" fill="#059669" font-weight="bold" letter-spacing="1.5">RUNNABLE R CODE</text>
+  <text x="510" y="140" font-family="monospace" font-size="10.5" fill="#1e3a5f">ggplot(mtcars,</text>
+  <text x="510" y="156" font-family="monospace" font-size="10.5" fill="#1e3a5f">  aes(wt, mpg, color=cyl))</text>
 
-  <!-- Step 3: R Code -->
-  <rect x="480" y="124" width="200" height="56" rx="10" fill="#0f172a" stroke="#1e293b" stroke-width="1"/>
-  <text x="500" y="142" font-family="monospace" font-size="9" fill="#22c55e" letter-spacing="1.5">RUNNABLE R CODE</text>
-  <text x="500" y="164" font-family="monospace" font-size="11" fill="#4ade80">ggplot(mtcars,</text>
-  <text x="500" y="178" font-family="monospace" font-size="11" fill="#4ade80">  aes(wt, mpg, color=cyl))</text>
+  <!-- Divider -->
+  <line x1="120" y2="186" x2="600" y2="186" stroke="#e5e7eb" stroke-width="1"/>
 
-  <!-- Bottom bar -->
-  <rect x="120" y="208" width="480" height="1" fill="#1e293b"/>
-  <text x="360" y="236" text-anchor="middle" font-family="monospace" font-size="10" fill="#475569">
-    34 functions · 13+ providers · Chat · Code Gen · Dashboard · Python · Terminal · Compile
+  <!-- Bottom info -->
+  <text x="360" y="208" text-anchor="middle" font-family="monospace" font-size="9.5" fill="#64748b">
+    34 functions · Chat · Code Gen · Dashboard · Python · Terminal · Compile
   </text>
-  <text x="360" y="256" text-anchor="middle" font-family="monospace" font-size="10" fill="#334155">
-    English → R Code · Small LLM optimized · Windows-safe · Privacy-first
+  <text x="360" y="226" text-anchor="middle" font-family="monospace" font-size="9" fill="#94a3b8">
+    Small LLM optimized · Windows-safe · Works with any model · Privacy-first
   </text>
+
+  <!-- Bottom accent bar -->
+  <rect x="0" y="255" width="720" height="5" rx="2" fill="url(#accent)"/>
 </svg>

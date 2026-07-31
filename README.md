@@ -21,7 +21,7 @@ raix connects RStudio to any AI model — local or cloud. You describe what you 
 
 ```r
 raix::raix_setup()          # auto-detects Ollama, configures in seconds
-raix::raix_dashboard()      # live coding workspace in your browser
+raix::raix_dashboard()      # coding workspace in RStudio Viewer
 ```
 
 <br>
@@ -54,7 +54,7 @@ library(raix)
 raix_setup()                                           # one click, auto-detects everything
 
 raix_chat()                                            # interactive AI chat in console
-raix_dashboard()                                       # full coding workspace in browser
+raix_dashboard()                                       # coding workspace in RStudio Viewer
 
 raix_explain("sapply(split(mtcars$mpg, mtcars$cyl), mean)")  # explain any R code
 raix_generate("Create a heatmap of the correlation matrix")  # English → R code
