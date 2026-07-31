@@ -45,6 +45,8 @@ raix::raix_dashboard()      # coding workspace in RStudio Viewer
 remotes::install_github("twomathematicians-code/raix")
 ```
 
+> **Having issues?** See [SOP.md](SOP.md) for detailed installation guide and troubleshooting.
+
 <br>
 
 ## Core commands
