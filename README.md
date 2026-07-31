@@ -19,13 +19,13 @@
 raix connects RStudio to any AI model — local or cloud. Describe your analysis in plain English and get working R code instantly. Chat, debug, generate notebooks, run Python, compile C++, or launch a full R + AI coding dashboard — all without leaving RStudio.
 
 ```r
-# From GitHub
+# From GitHub (primary)
 remotes::install_github("twomathematicians-code/raix")
 
-# Or from R-universe  
-install.packages("raix", repos = "https://twomathematicians-code.r-universe.dev")
+# From R-universe (after registration)
+install.packages("raix", repos = c("https://twomathematicians-code.r-universe.dev", "https://cloud.r-project.org"))
 library(raix)
-raix_dashboard()    # opens fully configured — auto-detects your AI, ready to use
+raix_dashboard()
 ```
 
 > **Trouble installing?** See [SOP.md](SOP.md) — covers every install issue.
