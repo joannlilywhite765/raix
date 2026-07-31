@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="man/figures/hero.svg" alt="raix — You Describe. AI Generates. R Executes." width="720">
+  <img src="man/figures/hero.png" alt="raix — You Describe. AI Generates. R Executes." width="720">
 </p>
 
 <p align="center">
