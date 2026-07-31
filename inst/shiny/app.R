@@ -418,20 +418,20 @@ server <- function(input, output, session) {
     # Try to connect using current raix defaults
     tryCatch({
       if (!connected()) {
-        # Load current raix env settings into UI
-        updateSelectInput(session, "provider", selected = raix_env$provider)
-        updateTextInput(session, "model", value = raix_env$model)
-        if (!is.null(raix_env$api_key)) updateTextInput(session, "api_key", value = raix_env$api_key)
-        updateSelectInput(session, "api_format", selected = raix_env$api_format)
-        updateSliderInput(session, "temperature", value = raix_env$temperature)
-        updateNumericInput(session, "max_tokens", value = raix_env$max_tokens)
+        cfg <- raix_config()
+        updateSelectInput(session, "provider", selected = cfg$provider)
+        updateTextInput(session, "model", value = cfg$model)
+        if (cfg$has_api_key) updateTextInput(session, "api_key", value = "")
+        updateSelectInput(session, "api_format", selected = cfg$api_format)
+        updateSliderInput(session, "temperature", value = cfg$temperature)
+        updateNumericInput(session, "max_tokens", value = cfg$max_tokens)
         
         # Try auto-connect
         reachable <- tryCatch(raix_check(), error = function(e) FALSE)
         if (isTRUE(reachable)) {
           connected(TRUE)
-          current_provider(raix_env$provider)
-          current_model(raix_env$model)
+          current_provider(cfg$provider)
+          current_model(cfg$model)
         }
       }
     }, error = function(e) NULL)

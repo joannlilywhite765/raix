@@ -356,7 +356,28 @@ raix_info <- function() {
   cli::cli_li("Base URL: {raix_env$base_url}")
   cli::cli_li("Temperature: {raix_env$temperature}")
   cli::cli_li("Max tokens: {raix_env$max_tokens}")
+  cli::cli_li("Small model: {raix_env$small_model}")
   cli::cli_li("History: {length(raix_env$chat_history)} messages")
   cli::cli_text(""); cli::cli_text("Run {.fn raix_check} to test connectivity.")
-  invisible(NULL)
+  invisible(as.list(raix_env))
+}
+
+#' Get current raix configuration as a list
+#'
+#' Returns provider, model, API format, and all settings without printing.
+#' Use this to read config programmatically in scripts and Shiny apps.
+#'
+#' @return List with all raix configuration values
+#' @export
+raix_config <- function() {
+  list(
+    provider = raix_env$provider,
+    model = raix_env$model,
+    api_format = raix_env$api_format,
+    base_url = raix_env$base_url,
+    temperature = raix_env$temperature,
+    max_tokens = raix_env$max_tokens,
+    small_model = raix_env$small_model,
+    has_api_key = !is.null(raix_env$api_key) && nchar(raix_env$api_key) > 0
+  )
 }

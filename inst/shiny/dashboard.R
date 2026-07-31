@@ -195,6 +195,8 @@ server <- function(input, output, session) {
   code_text <- reactiveVal("library(ggplot2)\n\n# Write R code here or ask raix to generate it\n# Click ▶ Run to execute\n\nggplot(mtcars, aes(x = wt, y = mpg, color = factor(cyl))) +\n  geom_point(size = 3) +\n  theme_minimal()")
   console_out <- reactiveVal(list())
   connected <- reactiveVal(FALSE)
+  current_provider <- reactiveVal("ollama")
+  current_model <- reactiveVal("llama3.2")
   
   # === Auto-detect on launch ===
   observe({
@@ -206,6 +208,8 @@ server <- function(input, output, session) {
         ok <- tryCatch(raix_check_silent(), error = function(e) FALSE)
         if (isTRUE(ok)) {
           connected(TRUE)
+          current_provider(detected$provider)
+          current_model(detected$model)
           updateSelectInput(session, "setup_provider", selected = detected$provider)
           updateTextInput(session, "setup_model", value = detected$model)
         }
@@ -216,7 +220,7 @@ server <- function(input, output, session) {
   # === Connection UI ===
   output$conn_text <- renderUI({
     if (connected()) {
-      span(paste("Connected —", raix_env$provider, "/", raix_env$model))
+      span(paste("Connected —", current_provider(), "/", current_model()))
     } else {
       span("Not connected — click Setup")
     }
@@ -263,9 +267,10 @@ server <- function(input, output, session) {
                      base_url = url, api_key = key)
       ok <- raix_check_silent()
       if (isTRUE(ok)) {
+        current_provider(input$setup_provider)
+        current_model(input$setup_model)
         if (input$setup_provider == "ollama") {
           tryCatch(raix_send("hi"), error = function(e) NULL)
-          raix_env$first_call <- FALSE
         }
         connected(TRUE)
         output$setup_status <- renderUI({
@@ -373,7 +378,7 @@ server <- function(input, output, session) {
   output$workspace <- renderUI({
     div(class = "ws-body",
       div(class = "code-area",
-        div(class = "area-label", paste0("R CODE  •  ", raix_env$provider, "/", raix_env$model)),
+        div(class = "area-label", paste0("R CODE  •  ", current_provider(), "/", current_model())),
         if (has_ace) {
           shinyAce::aceEditor("code_editor", mode = "r", theme = "monokai",
             value = code_text(), height = "100%", fontSize = 13,
