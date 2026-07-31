@@ -151,13 +151,3 @@ flowchart LR
 ## License
 
 MIT © [Mahesh Solanki](https://github.com/twomathematicians-code) · [SOP.md](SOP.md) · `citation("raix")`
-# Achievement PR 1
-# Achievement PR 2
-# Achievement PR 3
-# Achievement PR 4
-# Achievement PR 5
-# Achievement PR 6
-# Achievement PR 7
-# Achievement PR 8
-# Achievement PR 9
-# Achievement PR 10
