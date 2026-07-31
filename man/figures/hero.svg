@@ -1,0 +1,59 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 280" width="720" height="280">
+  <defs>
+    <linearGradient id="g1" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#1a1a2e"/>
+      <stop offset="100%" style="stop-color:#16213e"/>
+    </linearGradient>
+    <linearGradient id="accent" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" style="stop-color:#667eea"/>
+      <stop offset="100%" style="stop-color:#a78bfa"/>
+    </linearGradient>
+    <filter id="glow">
+      <feGaussianBlur stdDeviation="2" result="blur"/>
+      <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+  </defs>
+
+  <rect width="720" height="280" rx="16" fill="url(#g1)"/>
+
+  <!-- Title -->
+  <text x="360" y="52" text-anchor="middle" font-family="monospace" font-size="28" font-weight="bold" fill="url(#accent)" filter="url(#glow)">raix</text>
+  <text x="360" y="74" text-anchor="middle" font-family="sans-serif" font-size="12" fill="#64748b" letter-spacing="2">R + AI + eXperience</text>
+
+  <!-- Arrow -->
+  <text x="360" y="104" text-anchor="middle" font-size="20" fill="#334155">↓</text>
+
+  <!-- Flow: English → AI → R Code -->
+  <!-- Step 1: English -->
+  <rect x="40" y="124" width="200" height="56" rx="10" fill="#0f172a" stroke="#1e293b" stroke-width="1"/>
+  <text x="60" y="142" font-family="monospace" font-size="9" fill="#818cf8" letter-spacing="1.5">DESCRIBE IN ENGLISH</text>
+  <text x="60" y="164" font-family="monospace" font-size="11" fill="#e2e8f0">"Create a scatter plot</text>
+  <text x="60" y="178" font-family="monospace" font-size="11" fill="#e2e8f0"> of mtcars colored by cyl"</text>
+
+  <!-- Arrow -->
+  <text x="252" y="156" font-size="18" fill="#334155">→</text>
+
+  <!-- Step 2: AI -->
+  <rect x="280" y="124" width="160" height="56" rx="10" fill="#1e1b4b" stroke="#312e81" stroke-width="1"/>
+  <text x="300" y="142" font-family="monospace" font-size="9" fill="#a78bfa" letter-spacing="1.5">AI GENERATES</text>
+  <text x="300" y="164" font-family="monospace" font-size="11" fill="#c4b5fd">qwen2.5-coder</text>
+  <text x="300" y="178" font-family="monospace" font-size="10" fill="#8b5cf6">gpt-4o · claude · ollama</text>
+
+  <!-- Arrow -->
+  <text x="452" y="156" font-size="18" fill="#334155">→</text>
+
+  <!-- Step 3: R Code -->
+  <rect x="480" y="124" width="200" height="56" rx="10" fill="#0f172a" stroke="#1e293b" stroke-width="1"/>
+  <text x="500" y="142" font-family="monospace" font-size="9" fill="#22c55e" letter-spacing="1.5">RUNNABLE R CODE</text>
+  <text x="500" y="164" font-family="monospace" font-size="11" fill="#4ade80">ggplot(mtcars,</text>
+  <text x="500" y="178" font-family="monospace" font-size="11" fill="#4ade80">  aes(wt, mpg, color=cyl))</text>
+
+  <!-- Bottom bar -->
+  <rect x="120" y="208" width="480" height="1" fill="#1e293b"/>
+  <text x="360" y="236" text-anchor="middle" font-family="monospace" font-size="10" fill="#475569">
+    34 functions · 13+ providers · Chat · Code Gen · Dashboard · Python · Terminal · Compile
+  </text>
+  <text x="360" y="256" text-anchor="middle" font-family="monospace" font-size="10" fill="#334155">
+    English → R Code · Small LLM optimized · Windows-safe · Privacy-first
+  </text>
+</svg>
