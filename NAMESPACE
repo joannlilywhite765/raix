@@ -35,6 +35,12 @@ export(raix_benchmark)
 export(raix_parallel)
 export(raix_sysinfo)
 export(raix_run)
+export(raix_test)
+export(raix_refactor)
+export(raix_translate)
+export(raix_sql)
+export(raix_web)
+export(raix_history)
 
 importFrom(utils, available.packages, browseURL, capture.output,
            head, installed.packages, URLencode)

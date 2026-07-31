@@ -1,7 +1,7 @@
 Package: raix
 Type: Package
 Title: raix = R + AI + eXperiment
-Version: 0.7.1
+Version: 0.8.0
 Authors@R: c(
     person("Mahesh", "Solanki", email = "maheshsinh1910@gmail.com",
            role = c("aut", "cre")))

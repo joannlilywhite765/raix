@@ -576,7 +576,7 @@ raix_help <- function() {
     "*" = "{.code raix_write('desc', 'out.R')} --- Write AI content to file"
   ))
 
-  cli::cli_h3("[Compute] Terminal, Python, Compile, Pipeline")
+  cli::cli_h3("[Compute] Terminal, Python, C++, Pipeline")
   cli::cli_bullets(c(
     "*" = "{.code raix_terminal('ls -la')} --- Run shell commands + AI analysis",
     "*" = "{.code raix_python('task')} --- Generate and run Python from R",
@@ -586,6 +586,16 @@ raix_help <- function() {
     "*" = "{.code raix_parallel('task')} --- AI rewrites code for multi-core",
     "*" = "{.code raix_sysinfo()} --- Show CPU/RAM/GPU/Python info for AI context",
     "*" = "{.code raix_run('script.py')} --- Run any script (R, Python, shell, JS)"
+  ))
+
+  cli::cli_h3("[Advanced] Test, Refactor, Translate, SQL, Web")
+  cli::cli_bullets(c(
+    "*" = "{.code raix_test(my_function)} --- Generate unit tests with testthat",
+    "*" = "{.code raix_refactor(code)} --- AI suggestions for cleaner/faster code",
+    "*" = "{.code raix_translate(code, to='python')} --- Convert R ↔ Python",
+    "*" = "{.code raix_sql('top 10 customers by revenue')} --- English → SQL",
+    "*" = "{.code raix_web(url)} --- Fetch and summarize any web page",
+    "*" = "{.code raix_history()} --- View/search your chat history"
   ))
 
   cli::cli_h3("[Config] Configuration")

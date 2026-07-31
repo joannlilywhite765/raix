@@ -47,6 +47,11 @@ raix_dashboard()
 | Run Python from R | `raix_python("Train an XGBoost model")` |
 | Compile C++ for speed | `raix_compile("Fast matrix multiplication")` |
 | Build a pipeline | `raix_pipeline(c("Load CSV","Clean","Model"))` |
+| Translate R ↔ Python | `raix_translate(code, to = "python")` |
+| English → SQL | `raix_sql("Top 10 customers by revenue")` |
+| Generate unit tests | `raix_test(my_function)` |
+| Refactor code | `raix_refactor(code, focus = "performance")` |
+| Fetch & summarize web | `raix_web("https://example.com")` |
 | Find the best package | `raix_package("survival analysis")` |
 | Profile your code | `raix_benchmark({ my_slow_function(df) })` |
 | Parallelize code | `raix_parallel("Fit GLM to 1000 subsets")` |
