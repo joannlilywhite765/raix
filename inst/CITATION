@@ -5,11 +5,12 @@ citEntry(
   title    = "raix: R + AI + eXperience — AI-Powered Coding Assistant for R",
   author   = personList(as.person("Mahesh Solanki")),
   year     = "2026",
-  note      = "R package version 0.7.0",
+  note     = "R package version 0.8.1",
+  doi      = "10.5281/zenodo.21717069",
   url      = "https://github.com/twomathematicians-code/raix",
   textVersion = paste(
     "Mahesh Solanki (2026). raix: R + AI + eXperience.",
-    "R package version 0.7.0.",
+    "R package version 0.8.1. DOI: 10.5281/zenodo.21717069.",
     "https://github.com/twomathematicians-code/raix"
   )
 )
