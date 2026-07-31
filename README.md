@@ -52,6 +52,7 @@ raix_dashboard()
 | Generate unit tests | `raix_test(my_function)` |
 | Refactor code | `raix_refactor(code, focus = "performance")` |
 | Fetch & summarize web | `raix_web("https://example.com")` |
+| Run simulations | `raix_simulate("Monte Carlo power analysis", run = TRUE)` |
 | Find the best package | `raix_package("survival analysis")` |
 | Profile your code | `raix_benchmark({ my_slow_function(df) })` |
 | Parallelize code | `raix_parallel("Fit GLM to 1000 subsets")` |

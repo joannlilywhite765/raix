@@ -595,6 +595,7 @@ raix_help <- function() {
     "*" = "{.code raix_translate(code, to='python')} --- Convert R ↔ Python",
     "*" = "{.code raix_sql('top 10 customers by revenue')} --- English → SQL",
     "*" = "{.code raix_web(url)} --- Fetch and summarize any web page",
+    "*" = "{.code raix_simulate('stock price random walk')} --- AI simulation engine",
     "*" = "{.code raix_history()} --- View/search your chat history"
   ))
 

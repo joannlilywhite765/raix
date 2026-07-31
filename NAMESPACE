@@ -41,6 +41,7 @@ export(raix_translate)
 export(raix_sql)
 export(raix_web)
 export(raix_history)
+export(raix_simulate)
 
 importFrom(utils, available.packages, browseURL, capture.output,
            head, installed.packages, URLencode)

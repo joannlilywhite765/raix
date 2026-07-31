@@ -308,3 +308,104 @@ raix_history <- function(search = NULL, n = 20, clear = FALSE) {
   
   invisible(history)
 }
+
+#' AI-powered simulation engine
+#'
+#' Describe the system or process you want to simulate and raix generates
+#' complete R simulation code with parameters, iterations, and analysis.
+#' Supports Monte Carlo, bootstrap, power analysis, stochastic processes,
+#' agent-based models, time series, and differential equations.
+#'
+#' @param description What to simulate, in plain English
+#' @param n_iterations Number of simulation iterations (default: 1000)
+#' @param output Optional file path for the simulation script
+#' @param run If TRUE, executes the simulation and returns results
+#' @param seed Random seed for reproducibility
+#' @return Simulation code and optionally results
+#' @export
+raix_simulate <- function(description, n_iterations = 1000, output = NULL, 
+                          run = FALSE, seed = 42) {
+  if (missing(description) || !is.character(description) || nchar(trimws(description)) == 0) {
+    stop("description must describe what you want to simulate")
+  }
+  
+  cli::cli_h1("raix Simulation Engine")
+  cli::cli_text("Task: {description}")
+  cli::cli_text("Iterations: {n_iterations} | Seed: {seed}")
+  
+  # Step 1: Plan the simulation
+  cli::cli_h3("Designing simulation...")
+  plan_prompt <- if (raix_env$small_model) {
+    paste0("Design a Monte Carlo simulation for: ", description, 
+           "\nList: 1) Approach 2) Variables 3) Metrics to track. Be brief.")
+  } else {
+    paste0("Design a Monte Carlo simulation for this problem:\n\n", description, "\n\n",
+           "Tell me: 1) The simulation approach (Monte Carlo, bootstrap, agent-based, etc.), ",
+           "2) Key variables and their distributions, 3) What metrics to track and analyze. ",
+           "Keep it concise.")
+  }
+  
+  plan <- tryCatch(raix_send(plan_prompt), error = function(e) NULL)
+  if (!is.null(plan)) {
+    cat("\n", cli::col_blue("Simulation Plan:"), "\n", plan, "\n\n")
+  }
+  
+  # Step 2: Generate simulation code
+  cli::cli_h3("Generating simulation code...")
+  code_prompt <- if (raix_env$small_model) {
+    paste0("Write R simulation code for: ", description, "\n",
+           n_iterations, " iterations, seed ", seed, "\n",
+           if (!is.null(plan)) paste0("Plan: ", plan, "\n") else "",
+           "Use base R. Include: parameters, loop, results collection, summary stats, histogram. Output ONLY code.")
+  } else {
+    paste0("Write a complete R simulation for:\n\n", description, "\n\n",
+           "Requirements:\n",
+           "- Run ", n_iterations, " iterations\n",
+           "- Set seed to ", seed, " for reproducibility\n",
+           if (!is.null(plan)) paste0("- Follow this plan:\n", plan, "\n") else "",
+           "- Define all parameters clearly at the top\n",
+           "- Run the simulation loop efficiently (pre-allocate, vectorize if possible)\n",
+           "- Collect and store all relevant metrics\n",
+           "- Generate summary statistics (mean, sd, quantiles)\n",
+           "- Create at least one visualization (histogram, density plot, or line chart)\n",
+           "- Add comments explaining each step\n",
+           "Output the complete, ready-to-run R script.")
+  }
+  
+  sim_code <- tryCatch(raix_send(code_prompt), error = function(e) NULL)
+  if (is.null(sim_code)) {
+    cli::cli_alert_danger("Simulation generation failed")
+    return(invisible(NULL))
+  }
+  
+  sim_code <- raix_extract_code(sim_code)
+  
+  cat("\n", cli::col_green("Simulation Code:"), "\n")
+  cat(sim_code, "\n\n")
+  
+  if (!is.null(output)) {
+    writeLines(sim_code, output)
+    cli::cli_alert_success("Saved to {.file {output}}")
+  }
+  
+  # Step 3: Execute
+  if (run) {
+    cli::cli_h3("Running simulation ({n_iterations} iterations)...")
+    set.seed(seed)
+    start_time <- Sys.time()
+    
+    result <- tryCatch({
+      eval(parse(text = sim_code), envir = globalenv())
+    }, error = function(e) {
+      cli::cli_alert_danger("Simulation error: {conditionMessage(e)}")
+      NULL
+    })
+    
+    elapsed <- difftime(Sys.time(), start_time, units = "secs")
+    cli::cli_alert_success("Completed in {round(elapsed, 1)}s")
+    
+    return(invisible(list(code = sim_code, result = result, time = elapsed)))
+  }
+  
+  invisible(sim_code)
+}
