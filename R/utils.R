@@ -237,7 +237,8 @@ raix_check_silent <- function() {
 #' @return A data.frame of matching packages with titles
 #' @export
 raix_search <- function(topic, n = 10) {
-  if (missing(topic) || !is.character(topic) || nchar(trimws(topic)) == 0) {
+  if (missing(topic) || is.null(topic) || length(topic) != 1 || 
+      is.na(topic) || !is.character(topic) || nchar(trimws(topic)) == 0) {
     stop("topic must be a non-empty string (e.g., 'clustering', 'plotting')")
   }
   cli::cli_alert_info("Searching for R packages: '{topic}'...")
@@ -451,7 +452,8 @@ raix_analyze <- function(data) {
 #'
 #' @export
 raix_google <- function(query, open_browser = TRUE) {
-  if (missing(query) || !is.character(query) || nchar(trimws(query)) == 0) {
+  if (missing(query) || is.null(query) || is.na(query) || 
+      !is.character(query) || nchar(trimws(query)) == 0) {
     stop("query must be a non-empty search string")
   }
   encoded <- utils::URLencode(query)
@@ -612,7 +614,8 @@ raix_help <- function() {
 #' @return The generated solution (invisibly)
 #' @export
 raix_solve <- function(problem, data = NULL, output = NULL, execute = FALSE) {
-  if (missing(problem) || !is.character(problem) || nchar(trimws(problem)) == 0) {
+  if (missing(problem) || is.null(problem) || is.na(problem) || 
+      !is.character(problem) || nchar(trimws(problem)) == 0) {
     stop("problem must be a non-empty description of what you want to solve")
   }
   
@@ -839,7 +842,8 @@ raix_project <- function(path = ".") {
 #' @return Recommended packages with install commands (invisibly)
 #' @export
 raix_package <- function(task) {
-  if (missing(task) || !is.character(task) || nchar(trimws(task)) == 0) {
+  if (missing(task) || is.null(task) || is.na(task) || 
+      !is.character(task) || nchar(trimws(task)) == 0) {
     stop("task must describe what you want to do (e.g., 'deep learning', 'geo mapping')")
   }
   

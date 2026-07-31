@@ -15,7 +15,8 @@
 #' @return List with status, stdout, stderr, and optional AI explanation
 #' @export
 raix_terminal <- function(command, explain = FALSE, capture = TRUE) {
-  if (missing(command) || !is.character(command) || nchar(trimws(command)) == 0) {
+  if (missing(command) || is.null(command) || is.na(command) || 
+      !is.character(command) || nchar(trimws(command)) == 0) {
     stop("command must be a non-empty shell command string")
   }
   
