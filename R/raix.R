@@ -219,8 +219,8 @@ raix_configure <- function(provider = NULL, model = NULL, api_key = NULL,
 	  if (p %in% names(defaults)) raix_env$model <- defaults[[p]]
 	  }
 	
-	  # Auto-detect and optimize for small models
-	  is_small <- raix_optimize_for_model(raix_env$model)
+  # Auto-detect and optimize for small models (only if user didn't set custom prompt)
+  is_small <- if (is.null(system_prompt)) raix_optimize_for_model(raix_env$model) else raix_env$small_model
 	
 	  cli::cli_alert_success("raix configured: {raix_env$provider} / {raix_env$model} [{raix_env$api_format}]{if(is_small) ' [small-model optimized]' else ''}")
   invisible(as.list(raix_env))
