@@ -1,66 +1,109 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 340" width="720" height="340">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 300" width="720" height="300">
   <defs>
     <linearGradient id="brand" x1="0%" y1="0%" x2="100%" y2="0%">
       <stop offset="0%" style="stop-color:#1e3a5f"/>
       <stop offset="100%" style="stop-color:#2563eb"/>
     </linearGradient>
-    <linearGradient id="purple" x1="0%" y1="0%" x2="100%" y2="0%">
-      <stop offset="0%" style="stop-color:#667eea"/>
-      <stop offset="100%" style="stop-color:#a78bfa"/>
-    </linearGradient>
   </defs>
+  
+  <!-- White bg -->
+  <rect width="720" height="300" rx="12" fill="#ffffff"/>
+  
+  <!-- Header -->
+  <text x="360" y="32" text-anchor="middle" font-family="monospace" font-size="22" font-weight="bold" fill="#1e3a5f">raix</text>
+  <text x="360" y="46" text-anchor="middle" font-family="monospace" font-size="8.5" fill="#94a3b8" letter-spacing="2.5">ENGLISH → AI → R CODE</text>
 
-  <!-- White background -->
-  <rect width="720" height="340" rx="12" fill="#ffffff"/>
+  <!-- Left Panel: R Console -->
+  <rect x="22" y="60" width="332" height="185" rx="8" fill="#0d1117"/>
+  <rect x="22" y="60" width="332" height="26" rx="8" fill="#161b22"/>
+  <rect x="22" y="74" width="332" height="12" fill="#161b22"/>
+  <circle cx="36" cy="73" r="4.5" fill="#f85149"/>
+  <circle cx="50" cy="73" r="4.5" fill="#d29922"/>
+  <circle cx="64" cy="73" r="4.5" fill="#3fb950"/>
+  <text x="340" y="77" text-anchor="end" font-family="monospace" font-size="9" fill="#484f58">R Console</text>
 
-  <!-- Title -->
-  <text x="360" y="38" text-anchor="middle" font-family="monospace" font-size="24" font-weight="bold" fill="#1e3a5f">raix</text>
-  <text x="360" y="54" text-anchor="middle" font-family="monospace" font-size="9" fill="#64748b" letter-spacing="3">R + AI + eXperience</text>
+  <!-- R Code in left panel -->
+  <text x="38" y="106" font-family="monospace" font-size="10.5" fill="#3fb950">&gt;</text>
+  <text x="52" y="106" font-family="monospace" font-size="10.5" fill="#c9d1d9">library(raix)</text>
 
-  <!-- Terminal Window -->
-  <rect x="30" y="72" width="660" height="198" rx="10" fill="#0f172a"/>
-  <!-- Terminal title bar -->
-  <rect x="30" y="72" width="660" height="28" rx="10" fill="#1e293b"/>
-  <rect x="30" y="86" width="660" height="14" fill="#1e293b"/>
-  <circle cx="46" cy="86" r="5" fill="#ef4444"/>
-  <circle cx="62" cy="86" r="5" fill="#f59e0b"/>
-  <circle cx="78" cy="86" r="5" fill="#22c55e"/>
-  <text x="680" y="90" text-anchor="end" font-family="monospace" font-size="10" fill="#475569">raix — RStudio</text>
+  <text x="38" y="124" font-family="monospace" font-size="10.5" fill="#3fb950">&gt;</text>
+  <text x="52" y="124" font-family="monospace" font-size="10.5" fill="#c9d1d9">raix_setup()</text>
 
-  <!-- Code lines -->
-  <text x="50" y="120" font-family="monospace" font-size="11" fill="#22c55e">❯</text>
-  <text x="64" y="120" font-family="monospace" font-size="11" fill="#e2e8f0">library(raix)</text>
+  <text x="38" y="146" font-family="monospace" font-size="10.5" fill="#8b949e">  ollama / qwen2.5-coder:7b — ready</text>
 
-  <text x="50" y="140" font-family="monospace" font-size="11" fill="#22c55e">❯</text>
-  <text x="64" y="140" font-family="monospace" font-size="11" fill="#e2e8f0">raix_setup()</text>
+  <text x="38" y="168" font-family="monospace" font-size="10.5" fill="#3fb950">&gt;</text>
+  <text x="52" y="168" font-family="monospace" font-size="10.5" fill="#c9d1d9">raix_generate(</text>
 
-  <!-- AI response -->
-  <text x="50" y="164" font-family="monospace" font-size="11" fill="#818cf8">◇</text>
-  <text x="64" y="164" font-family="monospace" font-size="11" fill="#94a3b8">ollama / qwen2.5-coder:7b — ready</text>
+  <text x="38" y="186" font-family="monospace" font-size="10.5" fill="#f0f6fc">  "Create a scatter plot of mtcars,</text>
 
-  <text x="50" y="188" font-family="monospace" font-size="11" fill="#22c55e">❯</text>
-  <text x="64" y="188" font-family="monospace" font-size="11" fill="#e2e8f0">raix_generate(</text>
-  <text x="80" y="204" font-family="monospace" font-size="11" fill="#f8fafc">"ggplot2 scatter plot of mtcars mpg vs wt,</text>
-  <text x="80" y="220" font-family="monospace" font-size="11" fill="#f8fafc"> colored by cylinder, with trend line"</text>
-  <text x="64" y="236" font-family="monospace" font-size="11" fill="#e2e8f0">)</text>
+  <text x="38" y="204" font-family="monospace" font-size="10.5" fill="#f0f6fc">   color by cylinder, with trend line"</text>
 
-  <!-- AI code output -->
-  <text x="50" y="258" font-family="monospace" font-size="11" fill="#818cf8">◇</text>
-  <text x="64" y="258" font-family="monospace" font-size="11" fill="#94a3b8">ggplot(mtcars, aes(wt, mpg, color=factor(cyl))) +</text>
+  <text x="38" y="224" font-family="monospace" font-size="10.5" fill="#c9d1d9">)</text>
 
   <!-- Blinking cursor -->
-  <rect x="478" y="248" width="8" height="13" fill="#22c55e" opacity="0.8">
-    <animate attributeName="opacity" values="1;0;1" dur="1s" repeatCount="indefinite"/>
+  <rect x="340" y="220" width="7" height="12" fill="#3fb950" opacity="0.9">
+    <animate attributeName="opacity" values="1;0;1" dur="1.2s" repeatCount="indefinite"/>
   </rect>
 
-  <!-- Bottom: capability row -->
-  <text x="360" y="296" text-anchor="middle" font-family="monospace" font-size="10" fill="#64748b">
-    Chat  ·  Code Gen  ·  Debug  ·  Dashboard  ·  Python  ·  C++  ·  SQL  ·  Simulation  ·  Web
+  <!-- Arrow between panels -->
+  <text x="368" y="156" text-anchor="middle" font-family="monospace" font-size="16" fill="#d1d5db">⟶</text>
+
+  <!-- Right Panel: AI Output -->
+  <rect x="388" y="60" width="310" height="185" rx="8" fill="#0d1117"/>
+  <rect x="388" y="60" width="310" height="26" rx="8" fill="#161b22"/>
+  <rect x="388" y="74" width="310" height="12" fill="#161b22"/>
+  <circle cx="402" cy="73" r="4.5" fill="#f85149"/>
+  <circle cx="416" cy="73" r="4.5" fill="#d29922"/>
+  <circle cx="430" cy="73" r="4.5" fill="#3fb950"/>
+  <text x="684" y="77" text-anchor="end" font-family="monospace" font-size="9" fill="#484f58">AI Generated Code</text>
+
+  <!-- AI generated R code -->
+  <text x="404" y="106" font-family="monospace" font-size="10.5" fill="#ff7b72">library</text>
+  <text x="454" y="106" font-family="monospace" font-size="10.5" fill="#c9d1d9">(ggplot2)</text>
+
+  <text x="404" y="126" font-family="monospace" font-size="10.5" fill="#c9d1d9">ggplot(mtcars,</text>
+
+  <text x="404" y="146" font-family="monospace" font-size="10.5" fill="#79c0ff">  aes</text>
+  <text x="432" y="146" font-family="monospace" font-size="10.5" fill="#c9d1d9">(</text>
+  <text x="440" y="146" font-family="monospace" font-size="10.5" fill="#79c0ff">x</text>
+  <text x="448" y="146" font-family="monospace" font-size="10.5" fill="#ff7b72">=</text>
+  <text x="456" y="146" font-family="monospace" font-size="10.5" fill="#79c0ff">wt</text>
+  <text x="472" y="146" font-family="monospace" font-size="10.5" fill="#c9d1d9">,</text>
+  <text x="480" y="146" font-family="monospace" font-size="10.5" fill="#79c0ff">y</text>
+  <text x="488" y="146" font-family="monospace" font-size="10.5" fill="#ff7b72">=</text>
+  <text x="496" y="146" font-family="monospace" font-size="10.5" fill="#79c0ff">mpg</text>
+  <text x="520" y="146" font-family="monospace" font-size="10.5" fill="#c9d1d9">))</text>
+  <text x="540" y="146" font-family="monospace" font-size="10.5" fill="#ff7b72">+</text>
+
+  <text x="404" y="166" font-family="monospace" font-size="10.5" fill="#d2a8ff">  geom_point</text>
+  <text x="490" y="166" font-family="monospace" font-size="10.5" fill="#c9d1d9">(</text>
+  <text x="498" y="166" font-family="monospace" font-size="10.5" fill="#79c0ff">aes</text>
+  <text x="520" y="166" font-family="monospace" font-size="10.5" fill="#c9d1d9">(</text>
+  <text x="528" y="166" font-family="monospace" font-size="10.5" fill="#79c0ff">color</text>
+  <text x="564" y="166" font-family="monospace" font-size="10.5" fill="#ff7b72">=</text>
+  <text x="572" y="166" font-family="monospace" font-size="10.5" fill="#a5d6ff">factor</text>
+  <text x="614" y="166" font-family="monospace" font-size="10.5" fill="#c9d1d9">(cyl)))</text>
+  <text x="656" y="166" font-family="monospace" font-size="10.5" fill="#ff7b72">+</text>
+
+  <text x="404" y="186" font-family="monospace" font-size="10.5" fill="#d2a8ff">  geom_smooth</text>
+  <text x="500" y="186" font-family="monospace" font-size="10.5" fill="#c9d1d9">(</text>
+  <text x="508" y="186" font-family="monospace" font-size="10.5" fill="#79c0ff">method</text>
+  <text x="556" y="186" font-family="monospace" font-size="10.5" fill="#ff7b72">=</text>
+  <text x="564" y="186" font-family="monospace" font-size="10.5" fill="#a5d6ff">"lm"</text>
+  <text x="588" y="186" font-family="monospace" font-size="10.5" fill="#c9d1d9">)</text>
+  <text x="596" y="186" font-family="monospace" font-size="10.5" fill="#ff7b72">+</text>
+
+  <text x="404" y="206" font-family="monospace" font-size="10.5" fill="#d2a8ff">  theme_minimal</text>
+  <text x="512" y="206" font-family="monospace" font-size="10.5" fill="#c9d1d9">()</text>
+
+  <!-- Bottom info bar -->
+  <text x="360" y="268" text-anchor="middle" font-family="monospace" font-size="9.5" fill="#64748b">
+    42 functions · Chat · Debug · Dashboard · Python · C++ · SQL · Simulation · Web
   </text>
-  <text x="360" y="314" text-anchor="middle" font-family="monospace" font-size="9" fill="#94a3b8">
-    42 functions  ·  13+ providers  ·  MIT  ·  Windows-safe  ·  Small LLM optimized
+  <text x="360" y="284" text-anchor="middle" font-family="monospace" font-size="8.5" fill="#94a3b8">
+    13+ providers · MIT License · Small LLM Optimized · RStudio Integration
   </text>
 
-  <!-- Bottom accent bar -->
-  <rect x="0" y="335" width="720" height="5" fill="url(#brand)"/>
+  <!-- Bottom accent -->
+  <rect x="0" y="296" width="720" height="4" fill="url(#brand)"/>
 </svg>
