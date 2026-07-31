@@ -30,7 +30,13 @@ jobs:
       - name: R CMD build + check
         run: |
           R CMD build --no-build-vignettes .
-          R CMD check --no-manual --no-vignettes raix_*.tar.gz
+          R CMD check --no-manual --no-vignettes raix_*.tar.gz || {
+            echo "=== INSTALL LOG ==="
+            cat raix.Rcheck/00install.out 2>/dev/null || echo "No install log"
+            echo "=== CHECK LOG ==="
+            tail -50 raix.Rcheck/00check.log 2>/dev/null || echo "No check log"
+            exit 1
+          }
 
       - name: Run tests (non-blocking)
         continue-on-error: true
