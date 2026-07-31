@@ -1,101 +1,120 @@
 <p align="center">
-  <img src="man/figures/hero.png" alt="raix — You Describe. AI Generates. R Executes." width="720">
+  <img src="man/figures/hero.png" alt="raix" width="720">
 </p>
 
 <p align="center">
   <a href="https://github.com/twomathematicians-code/raix/releases"><img src="https://img.shields.io/github/v/release/twomathematicians-code/raix?color=667eea"></a>
   <a href="https://github.com/twomathematicians-code/raix/actions"><img src="https://github.com/twomathematicians-code/raix/actions/workflows/ci.yml/badge.svg"></a>
   <a href="LICENSE"><img src="https://img.shields.io/badge/license-MIT-green"></a>
-  <a href="#"><img src="https://img.shields.io/badge/R-%E2%89%A5%204.0-276DC3?logo=r"></a>
   <a href="#"><img src="https://img.shields.io/badge/functions-42-brightgreen"></a>
-  <a href="#"><img src="https://img.shields.io/badge/AI%20providers-13%2B-6366f1"></a>
-  <a href="https://twomathematicians-code.r-universe.dev/raix"><img src="https://twomathematicians-code.r-universe.dev/badges/raix"></a>
+  <a href="#"><img src="https://img.shields.io/badge/providers-13%2B-blue"></a>
 </p>
+
+**raix** connects RStudio to any AI model. Describe what you want in English — raix writes the R code, executes it, and shows results. Chat, debug, generate notebooks, run Python, compile C++, or launch a full coding dashboard.
+
+```r
+remotes::install_github("twomathematicians-code/raix")
+library(raix)
+raix_dashboard()    # self-configuring — auto-detects your AI
+```
+
+> [Installation help →](SOP.md) &nbsp;|&nbsp; [Release notes →](https://github.com/twomathematicians-code/raix/releases)
 
 <br>
 
-## You describe. AI generates. R executes.
-
-raix connects RStudio to any AI model — local or cloud. Describe your analysis in plain English and get working R code instantly. Chat, debug, generate notebooks, run Python, compile C++, or launch a full R + AI coding dashboard — all without leaving RStudio.
+## Architecture
 
 ```mermaid
 flowchart TB
     U[User Input] --> SETUP
 
-    subgraph SETUP[1. Setup Layer]
-        A1[raix_setup / auto-detect Ollama]
-        A2[raix_configure / manual config]
-        A3[raix_small_mode / LLM optimizer]
-        A4[raix_info · raix_config · raix_check]
+    subgraph SETUP[Setup]
+        A1[raix_setup · raix_configure]
+        A2[raix_small_mode · raix_config]
     end
 
     SETUP --> CORE
 
-    subgraph CORE[2. AI Communication]
-        B1[raix_send / prompt to any model]
-        B2[OpenAI Compatible / GPT, Groq, Mistral, DeepSeek...]
-        B3[Ollama Native / local models]
-        B4[Claude Native / Anthropic]
+    subgraph CORE[AI Backend]
+        B1[OpenAI / Groq / Mistral / DeepSeek]
+        B2[Ollama / LM Studio / vLLM]
+        B3[Claude / Custom endpoints]
     end
 
     CORE --> APPS
 
-    subgraph APPS[3. Application Layer]
-        C1[Chat / raix_chat · raix_gui · raix_dashboard]
-        C2[Code / explain · generate · debug · document]
-        C3[Agent / solve · script · notebook · test · refactor]
-        C4[Compute / terminal · python · compile · pipeline]
-        C5[Cross-Lang / translate · sql · simulate · web]
-        C6[Data / analyze · search · diagnose · package]
+    subgraph APPS[Applications]
+        C1[Chat & Dashboard]
+        C2[Code Gen & Debug]
+        C3[Developer Agent]
+        C4[Compute Engine]
+        C5[Cross-Language]
+        C6[Data & Project]
     end
 
     APPS --> OUT
-    OUT[4. Output: R Code · Scripts · Notebooks · Plots]
+    OUT[Scripts · Notebooks · Plots · Results]
 ```
-
-> **42 functions across 4 layers.** Setup once, use anywhere.
-
-
-```r
-# From GitHub (primary)
-remotes::install_github("twomathematicians-code/raix")
-
-# From R-universe (after registration)
-install.packages("raix", repos = c("https://twomathematicians-code.r-universe.dev", "https://cloud.r-project.org"))
-library(raix)
-raix_dashboard()
-```
-
-> **Trouble installing?** See [SOP.md](SOP.md) — covers every install issue.
 
 <br>
 
-## One package. Every workflow.
+## Commands by Workflow
 
-| You want to... | Command |
-|:---|---|
-| Chat with AI | `raix_chat()` |
-| Open coding dashboard | `raix_dashboard()` |
-| Generate R code | `raix_generate("Create a heatmap")` |
-| Explain code | `raix_explain("sapply(split(...))")` |
-| Debug an error | `raix_debug()` |
-| Get a complete solution | `raix_solve("Build a churn model")` |
-| Create a .R file | `raix_script("Clean this data", "clean.R")` |
-| Create a .Rmd notebook | `raix_notebook("Analyze sales", "report.Rmd")` |
-| Run Python from R | `raix_python("Train an XGBoost model")` |
-| Compile C++ for speed | `raix_compile("Fast matrix multiplication")` |
-| Build a pipeline | `raix_pipeline(c("Load CSV","Clean","Model"))` |
-| Translate R ↔ Python | `raix_translate(code, to = "python")` |
-| English → SQL | `raix_sql("Top 10 customers by revenue")` |
-| Generate unit tests | `raix_test(my_function)` |
-| Refactor code | `raix_refactor(code, focus = "performance")` |
-| Fetch & summarize web | `raix_web("https://example.com")` |
-| Run simulations | `raix_simulate("Monte Carlo power analysis", run = TRUE)` |
-| Find the best package | `raix_package("survival analysis")` |
-| Profile your code | `raix_benchmark({ my_slow_function(df) })` |
-| Parallelize code | `raix_parallel("Fit GLM to 1000 subsets")` |
-| Run shell commands | `raix_terminal("find . -name '*.csv'")` |
-| See all 42 commands | `raix_help()` |
+### Get Started
+```r
+raix_setup()          # auto-detect & configure — one click
+raix_dashboard()      # full coding workspace in RStudio Viewer
+raix_info()           # show current config
+raix_config()         # get config as list (for scripts)
+```
+
+### Chat & Generate Code
+```r
+raix_chat()           # interactive AI chat in console
+raix_gui()            # chat window in RStudio Viewer
+raix_send("prompt")   # one message → one response
+raix_explain("code")  # AI explains R code
+raix_generate("task") # English → R code
+raix_debug()          # diagnose last error
+raix_document("fn")   # generate roxygen2 docs
+```
+
+### Developer Agent
+```r
+raix_solve("problem")        # complete solution from description
+raix_script("task", "out.R") # generate .R file
+raix_notebook("task", "out.Rmd") # generate .Rmd notebook
+raix_test(my_function)       # AI writes testthat tests
+raix_refactor(code)          # AI suggests improvements
+raix_project(".")            # scan project for AI context
+raix_package("task")         # find best R package
+raix_read("file.R")          # read file with AI summary
+raix_write("desc", "out.R")  # AI content → file
+```
+
+### Compute & Cross-Language
+```r
+raix_terminal("cmd")         # shell commands + AI analysis
+raix_python("task")          # generate & run Python from R
+raix_compile("task")         # C++ with Rcpp, compile, call from R
+raix_pipeline(steps)         # multi-step cross-language workflow
+raix_translate(code, to="python") # R ↔ Python
+raix_sql("top 10 customers") # English → SQL
+raix_simulate("Monte Carlo") # AI simulation engine
+raix_web("https://...")      # fetch & summarize web pages
+```
+
+### Performance & Data
+```r
+raix_benchmark(expr)         # time code, AI suggests optimizations
+raix_parallel("task")        # AI rewrites for multi-core
+raix_analyze(mtcars)         # AI-guided data analysis
+raix_search("topic")         # search CRAN packages
+raix_diagnose("script.R")    # scan for issues & anti-patterns
+raix_google("query")         # Google search + AI summary
+raix_sysinfo()               # system info for AI context
+raix_history()               # view/search chat history
+```
 
 <br>
 
@@ -103,100 +122,31 @@ raix_dashboard()
 
 ```mermaid
 flowchart LR
-    A["Describe problem in English"] --> B[raix_solve]
-    B --> C{Plan & Design}
-    C --> D[Auto-select best R packages]
-    C --> E[Design solution approach]
-    D --> F[Generate complete R code]
-    E --> F
-    F --> G{Output Format}
-    G --> H[.R script via raix_script]
-    G --> I[.Rmd notebook via raix_notebook]
-    G --> J[Execute & return results]
-    H --> K[Open in RStudio Editor]
-    I --> K
-    J --> K
-```
-
-<br>
-<br>
-
-## Works with your models
-
-raix auto-detects what's running and configures itself. One click.
-
-| | Provider | Setup |
-|:--|:---|---|
-| 🏠 | **Ollama** | Free, local, private — `ollama pull llama3.2` |
-| 🏠 | **LM Studio** | Local GUI — download and run |
-| 🏠 | **vLLM** | Local server — `pip install vllm` |
-| ☁️ | **OpenAI** | GPT-4o, most capable — needs API key |
-| ☁️ | **Claude** | Long context reasoning — needs API key |
-| ☁️ | **Groq** | Fast, free tier available |
-| ☁️ | **DeepSeek** | Affordable code generation |
-| ☁️ | **Mistral** | European AI provider |
-| 🔧 | **Custom** | Any OpenAI-compatible endpoint |
-
-**Small model?** raix detects 7B-9B models and auto-optimizes prompts for reliable results.
-
-<br>
-
-## How it works — 4 steps
-
-```
-  1. You describe      2. AI generates       3. R code ready      4. ▶ Run
-  ┌──────────────┐    ┌──────────────┐    ┌──────────────┐    ┌──────────┐
-  │ "Create a     │ →  │ ollama       │ →  │ ggplot(mtcars,│ →  │ Execute  │
-  │  scatter plot │    │ openai       │    │   aes(wt, mpg,│    │ in       │
-  │  of mtcars"   │    │ claude ...   │    │   color=cyl)) │    │ RStudio  │
-  └──────────────┘    └──────────────┘    └──────────────┘    └──────────┘
+    A[English Description] --> B[raix_solve]
+    B --> C[Plan & Select Packages]
+    C --> D[Generate R Code]
+    D --> E{Output}
+    E --> F[.R Script]
+    E --> G[.Rmd Notebook]
+    E --> H[Execute & Return]
+    F --> I[Open in RStudio]
+    G --> I
+    H --> I
 ```
 
 <br>
 
-## Quick example
+## Supported Models
 
-```r
-library(raix)
+| Local (free) | Cloud (API key) |
+|:-------------|:----------------|
+| Ollama · LM Studio · vLLM | OpenAI · Claude · Groq · Mistral |
+| | DeepSeek · Together AI · Perplexity · OpenRouter |
 
-# 1. Setup (auto-detects everything)
-raix_setup()
-
-# 2. Ask for code
-raix_generate("Create an interactive plotly heatmap of the correlation matrix of mtcars")
-
-# 3. Get a complete solution for a real problem
-raix_solve("Predict customer churn: load data, explore, train random forest vs
-            logistic regression, compare with ROC curves, output top predictors")
-
-# 4. Launch the full dashboard
-raix_dashboard()
-```
-
-<br>
-
-## Contributing
-
-Issues, PRs, and ideas welcome at [github.com/twomathematicians-code/raix](https://github.com/twomathematicians-code/raix).  
-See [SOP.md](SOP.md) for development and release procedures.
+**Small models?** raix auto-detects 7B-9B models and optimizes prompts. `raix_small_mode(TRUE)` for manual control.
 
 <br>
 
 ## License
 
-MIT — see [LICENSE](LICENSE).
-
-## Citation
-
-```r
-citation("raix")
-```
-
-Mahesh Solanki (2026). raix: R + AI + eXperience. R package version 0.7.0.
-https://github.com/twomathematicians-code/raix
-
-<br>
-
-<p align="center">
-  <sub>Built with R. Powered by AI. Designed for humans.</sub>
-</p>
+MIT © [Mahesh Solanki](https://github.com/twomathematicians-code) · [SOP.md](SOP.md) · `citation("raix")`
