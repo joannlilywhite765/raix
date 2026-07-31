@@ -18,6 +18,23 @@
 
 ---
 
+## R + AI Coding Dashboard
+
+`raix_dashboard()` launches a full web-based R + AI workspace:
+
+- **Chat** with AI on the left — ask for code, explanations, debugging
+- **Code editor** with syntax highlighting — AI responses auto-populate
+- **▶ Run** executes code and shows plots, console output inline
+- **Save .R** downloads your work
+
+```r
+raix_dashboard()                        # Open in browser (auto-picks port)
+raix_dashboard(port = 8080)            # Specific port
+raix_dashboard(host = "0.0.0.0")       # Share on local network
+```
+
+---
+
 ## Installation
 
 ```r
@@ -40,8 +57,8 @@ raix_setup()
 # Or configure manually
 raix_configure(provider = "ollama", model = "llama3.2")
 
-# Or start solving immediately
-raix_solve("Analyze mtcars: find what predicts mpg, with plots")
+# Or open the full R + AI Coding Dashboard
+raix_dashboard()   # Live web app — chat, code editor, execute, plots!
 ```
 
 ---
