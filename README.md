@@ -7,7 +7,7 @@
   <a href="https://github.com/twomathematicians-code/raix/actions"><img src="https://github.com/twomathematicians-code/raix/actions/workflows/ci.yml/badge.svg"></a>
   <a href="LICENSE"><img src="https://img.shields.io/badge/license-MIT-green"></a>
   <a href="#"><img src="https://img.shields.io/badge/R-%E2%89%A5%204.0-276DC3?logo=r"></a>
-  <a href="#"><img src="https://img.shields.io/badge/functions-34-brightgreen"></a>
+  <a href="#"><img src="https://img.shields.io/badge/functions-42-brightgreen"></a>
   <a href="#"><img src="https://img.shields.io/badge/AI%20providers-13%2B-6366f1"></a>
   <a href="https://twomathematicians-code.r-universe.dev/raix"><img src="https://twomathematicians-code.r-universe.dev/badges/raix"></a>
 </p>
@@ -17,6 +17,44 @@
 ## You describe. AI generates. R executes.
 
 raix connects RStudio to any AI model — local or cloud. Describe your analysis in plain English and get working R code instantly. Chat, debug, generate notebooks, run Python, compile C++, or launch a full R + AI coding dashboard — all without leaving RStudio.
+
+```mermaid
+flowchart TB
+    U[User Input] --> SETUP
+
+    subgraph SETUP[1. Setup Layer]
+        A1[raix_setup / auto-detect Ollama]
+        A2[raix_configure / manual config]
+        A3[raix_small_mode / LLM optimizer]
+        A4[raix_info · raix_config · raix_check]
+    end
+
+    SETUP --> CORE
+
+    subgraph CORE[2. AI Communication]
+        B1[raix_send / prompt to any model]
+        B2[OpenAI Compatible / GPT, Groq, Mistral, DeepSeek...]
+        B3[Ollama Native / local models]
+        B4[Claude Native / Anthropic]
+    end
+
+    CORE --> APPS
+
+    subgraph APPS[3. Application Layer]
+        C1[Chat / raix_chat · raix_gui · raix_dashboard]
+        C2[Code / explain · generate · debug · document]
+        C3[Agent / solve · script · notebook · test · refactor]
+        C4[Compute / terminal · python · compile · pipeline]
+        C5[Cross-Lang / translate · sql · simulate · web]
+        C6[Data / analyze · search · diagnose · package]
+    end
+
+    APPS --> OUT
+    OUT[4. Output: R Code · Scripts · Notebooks · Plots]
+```
+
+> **42 functions across 4 layers.** Setup once, use anywhere.
+
 
 ```r
 # From GitHub (primary)
@@ -57,8 +95,30 @@ raix_dashboard()
 | Profile your code | `raix_benchmark({ my_slow_function(df) })` |
 | Parallelize code | `raix_parallel("Fit GLM to 1000 subsets")` |
 | Run shell commands | `raix_terminal("find . -name '*.csv'")` |
-| See all 34 commands | `raix_help()` |
+| See all 42 commands | `raix_help()` |
 
+<br>
+
+## Developer Agent Flow
+
+```mermaid
+flowchart LR
+    A["Describe problem in English"] --> B[raix_solve]
+    B --> C{Plan & Design}
+    C --> D[Auto-select best R packages]
+    C --> E[Design solution approach]
+    D --> F[Generate complete R code]
+    E --> F
+    F --> G{Output Format}
+    G --> H[.R script via raix_script]
+    G --> I[.Rmd notebook via raix_notebook]
+    G --> J[Execute & return results]
+    H --> K[Open in RStudio Editor]
+    I --> K
+    J --> K
+```
+
+<br>
 <br>
 
 ## Works with your models
