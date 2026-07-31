@@ -8,7 +8,6 @@
   <a href="LICENSE"><img src="https://img.shields.io/badge/license-MIT-green"></a>
   <a href="#"><img src="https://img.shields.io/badge/functions-42-brightgreen"></a>
   <a href="#"><img src="https://img.shields.io/badge/providers-13%2B-blue"></a>
-  <a href="https://doi.org/10.5281/zenodo.21717069"><img src="https://zenodo.org/badge/DOI/10.5281/zenodo.21717069.svg" alt="DOI"></a>
 </p>
 
 **raix** connects RStudio to any AI model. Describe what you want in English — raix writes the R code, executes it, and shows results. Chat, debug, generate notebooks, run Python, compile C++, or launch a full coding dashboard.
