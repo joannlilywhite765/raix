@@ -351,10 +351,10 @@ raix_benchmark <- function(expr, iterations = 10) {
     "\n```\n\n",
     if (raix_env$small_model) {
       "Suggest 1-2 specific optimizations. Be brief."
-    } else {
-      "Analyze this code for performance bottlenecks. Suggest specific, ",
-      "concrete optimizations with code examples. Consider: vectorization, ",
-      "pre-allocation, avoiding copies, using data.table, parallelization."
+	    } else {
+	      paste0("Analyze this code for performance bottlenecks. Suggest specific, ",
+	             "concrete optimizations with code examples. Consider: vectorization, ",
+	             "pre-allocation, avoiding copies, using data.table, parallelization.")
     }
   )
   
