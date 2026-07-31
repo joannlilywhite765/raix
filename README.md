@@ -150,3 +150,4 @@ flowchart LR
 ## License
 
 MIT © [Mahesh Solanki](https://github.com/twomathematicians-code) · [SOP.md](SOP.md) · `citation("raix")`
+# raix = R + AI + eXperiment
