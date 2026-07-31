@@ -8,3 +8,5 @@ create_man.R
 create_demo_gif.py
 raix_*.tar.gz
 rename_*.py
+raix.Rcheck/
+raix*.tar.gz
