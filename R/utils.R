@@ -38,15 +38,21 @@ raix_setup <- function(auto = TRUE, provider = NULL, model = NULL, api_key = NUL
     if (!is.null(detected)) {
       raix_configure(provider = detected$provider, model = detected$model,
                      api_key = detected$api_key)
-      if (isTRUE(raix_check_silent())) {
-        cli::cli_alert_success("{detected$provider} / {detected$model} --- ready!")
-        cli::cli_text("")
-        cli::cli_bullets(c(
-          "*" = "{.code raix_chat()} --- Start chatting",
-          "*" = "{.code raix_gui()} --- Open chat window",
-          "*" = "{.code raix_help()} --- All commands"
-        ))
-        return(invisible(raix_info()))
+	      if (isTRUE(raix_check_silent())) {
+	        # Pre-warm model: send tiny prompt so first real call doesn't time out
+	        if (detected$provider == "ollama") {
+	          cli::cli_alert_info("Warming up {detected$model} (loading into RAM)...")
+	          tryCatch(raix_send("hi"), error = function(e) NULL)
+	          raix_env$first_call <- FALSE
+	        }
+	        cli::cli_alert_success("{detected$provider} / {detected$model} --- ready!")
+	        cli::cli_text("")
+	        cli::cli_bullets(c(
+	          "*" = "{.code raix_chat()} --- Start chatting",
+	          "*" = "{.code raix_gui()} --- Open chat window",
+	          "*" = "{.code raix_help()} --- All commands"
+	        ))
+	        return(invisible(raix_info()))
       }
       cli::cli_alert_warning("{detected$provider} found but not responding.")
     }
@@ -100,6 +106,12 @@ raix_setup <- function(auto = TRUE, provider = NULL, model = NULL, api_key = NUL
   cli::cli_h3("Testing connection...")
   reachable <- tryCatch(raix_check(), error = function(e) FALSE)
   if (isTRUE(reachable)) {
+    # Pre-warm Ollama models to avoid first-call timeout
+    if (raix_env$provider == "ollama") {
+      cli::cli_alert_info("Warming up {raix_env$model} (loading into RAM)...")
+      tryCatch(raix_send("hi"), error = function(e) NULL)
+      raix_env$first_call <- FALSE
+    }
     cli::cli_alert_success("Connected! Type {.code raix_chat()} to start.")
   } else {
     cli::cli_alert_warning("Not reachable. Run {.code raix_setup()} to retry.")
@@ -110,43 +122,65 @@ raix_setup <- function(auto = TRUE, provider = NULL, model = NULL, api_key = NUL
   invisible(raix_info())
 }
 
+# Windows-safe port check — avoids curl segfault by using socketConnection
+# Returns TRUE if port is open and accepting connections
+raix_port_open <- function(host = "localhost", port = 11434, timeout = 1) {
+  con <- tryCatch({
+    suppressWarnings(
+      socketConnection(host = host, port = port, server = FALSE, 
+                       blocking = TRUE, open = "r+", timeout = timeout)
+    )
+  }, error = function(e) NULL)
+  if (!is.null(con)) {
+    tryCatch(close(con), error = function(e) NULL)
+    return(TRUE)
+  }
+  FALSE
+}
+
 # Auto-detect running AI backends, pick best code model
 raix_autodetect <- function() {
-  # 1. Check Ollama (localhost:11434)
-  ollama_check <- try(httr::GET("http://localhost:11434/api/tags", httr::timeout(2)), silent = TRUE)
-  if (!inherits(ollama_check, "try-error") && httr::status_code(ollama_check) < 400) {
-    models <- tryCatch({
-      parsed <- httr::content(ollama_check, "parsed", encoding = "UTF-8")
-      if (!is.null(parsed$models) && length(parsed$models) > 0) {
-        sapply(parsed$models, function(m) m$name)
-      } else NULL
-    }, error = function(e) NULL)
-    
-    if (!is.null(models) && length(models) > 0) {
-      # Prioritize code-capable models: coder > gemma > qwen > phi > llama > mistral > first
-      priority <- c("coder", "gemma", "qwen", "phi", "llama", "mistral", "deepseek")
-      best <- NULL
-      for (p in priority) {
-        matches <- models[grepl(p, models, ignore.case = TRUE)]
-        if (length(matches) > 0) { best <- matches[1]; break }
+  # 1. Check Ollama (localhost:11434) — TCP check first to avoid curl segfault
+  if (raix_port_open("localhost", 11434)) {
+    ollama_check <- try(httr::GET("http://localhost:11434/api/tags", httr::timeout(3)), silent = TRUE)
+    if (!inherits(ollama_check, "try-error") && httr::status_code(ollama_check) < 400) {
+      models <- tryCatch({
+        parsed <- httr::content(ollama_check, "parsed", encoding = "UTF-8")
+        if (!is.null(parsed$models) && length(parsed$models) > 0) {
+          sapply(parsed$models, function(m) m$name)
+        } else NULL
+      }, error = function(e) NULL)
+      
+      if (!is.null(models) && length(models) > 0) {
+        # Prioritize code-capable: coder > gemma > qwen > phi > llama > mistral > deepseek > first
+        priority <- c("coder", "gemma", "qwen", "phi", "llama", "mistral", "deepseek")
+        best <- NULL
+        for (p in priority) {
+          matches <- models[grepl(p, models, ignore.case = TRUE)]
+          if (length(matches) > 0) { best <- matches[1]; break }
+        }
+        model <- if (!is.null(best)) best else models[1]
+      } else {
+        model <- "llama3.2"
       }
-      model <- if (!is.null(best)) best else models[1]
-    } else {
-      model <- "llama3.2"
+      return(list(provider = "ollama", model = model, api_key = NULL))
     }
-    return(list(provider = "ollama", model = model, api_key = NULL))
   }
   
   # 2. Check LM Studio (localhost:1234)
-  lm_check <- try(httr::GET("http://localhost:1234/v1/models", httr::timeout(2)), silent = TRUE)
-  if (!inherits(lm_check, "try-error") && httr::status_code(lm_check) < 400) {
-    return(list(provider = "lmstudio", model = "local-model", api_key = NULL))
+  if (raix_port_open("localhost", 1234)) {
+    lm_check <- try(httr::GET("http://localhost:1234/v1/models", httr::timeout(2)), silent = TRUE)
+    if (!inherits(lm_check, "try-error") && httr::status_code(lm_check) < 400) {
+      return(list(provider = "lmstudio", model = "local-model", api_key = NULL))
+    }
   }
   
   # 3. Check vLLM (localhost:8000)
-  vllm_check <- try(httr::GET("http://localhost:8000/v1/models", httr::timeout(2)), silent = TRUE)
-  if (!inherits(vllm_check, "try-error") && httr::status_code(vllm_check) < 400) {
-    return(list(provider = "vllm", model = "default", api_key = NULL))
+  if (raix_port_open("localhost", 8000)) {
+    vllm_check <- try(httr::GET("http://localhost:8000/v1/models", httr::timeout(2)), silent = TRUE)
+    if (!inherits(vllm_check, "try-error") && httr::status_code(vllm_check) < 400) {
+      return(list(provider = "vllm", model = "default", api_key = NULL))
+    }
   }
   
   # 4. Check environment variables for API keys
@@ -161,7 +195,6 @@ raix_autodetect <- function() {
   for (p in names(env_checks)) {
     key <- Sys.getenv(env_checks[[p]])
     if (nchar(key) > 0) {
-      preset <- PROVIDER_PRESETS[[p]]
       return(list(provider = p, model = NULL, api_key = key))
     }
   }
@@ -169,8 +202,19 @@ raix_autodetect <- function() {
   NULL
 }
 
-# Silent connectivity check (no CLI output)
+# Silent connectivity check — TCP-first to avoid Windows curl crash
 raix_check_silent <- function() {
+  # Extract host/port from base_url
+  url_parts <- raix_env$base_url
+  host <- "localhost"
+  port <- if (raix_env$api_format == "ollama") 11434 
+          else if (grepl(":1234", url_parts)) 1234
+          else if (grepl(":8000", url_parts)) 8000
+          else NULL
+  
+  # TCP check first
+  if (!is.null(port) && !raix_port_open(host, port)) return(FALSE)
+  
   url <- if (raix_env$api_format == "ollama") paste0(raix_env$base_url, "/api/tags")
          else if (raix_env$api_format == "claude") paste0(raix_env$base_url, "/models")
          else paste0(raix_env$base_url, "/models")

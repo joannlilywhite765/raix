@@ -41,19 +41,66 @@ raix_claude_native <- function(messages, stream = FALSE) {
     field = "content.0.text")
 }
 
-# ── Core API call ───────────────────────────────────────────────────────────
-raix_api_call <- function(url, headers, body, field = "choices.0.message.content") {
-	  resp <- try(httr::POST(url, headers, body = jsonlite::toJSON(body, auto_unbox = TRUE),
-	    encode = "raw", httr::timeout(120)), silent = TRUE)
-  if (inherits(resp, "try-error")) {
-	    cli::cli_abort(c("raix: cannot reach {raix_env$provider}",
-      "i" = "URL: {url}", "x" = "{trimws(as.character(resp))}"))
+# ── Core API call with smart retry ──────────────────────────────────────────
+
+# Maximum seconds to wait for model loading (first inference on cold model)
+RAIX_FIRST_LOAD_TIMEOUT <- 180  
+# Normal timeout for subsequent calls
+RAIX_NORMAL_TIMEOUT <- 120
+
+raix_api_call <- function(url, headers, body, field = "choices.0.message.content", 
+                          retry_on_timeout = TRUE) {
+  timeout <- if (raix_env$first_call) RAIX_FIRST_LOAD_TIMEOUT else RAIX_NORMAL_TIMEOUT
+  
+  resp <- try(httr::POST(url, headers, body = jsonlite::toJSON(body, auto_unbox = TRUE),
+    encode = "raw", httr::timeout(timeout)), silent = TRUE)
+  
+  # Smart retry for timeout (model cold-start loading)
+  if (inherits(resp, "try-error") && retry_on_timeout && 
+      grepl("[Tt]imeout|timed out", as.character(resp))) {
+    if (raix_env$first_call) {
+      cli::cli_alert_info("Model is loading into memory (first call)... waiting up to {RAIX_FIRST_LOAD_TIMEOUT}s...")
+    }
+    # Retry once with longer timeout
+    resp <- try(httr::POST(url, headers, body = jsonlite::toJSON(body, auto_unbox = TRUE),
+      encode = "raw", httr::timeout(RAIX_FIRST_LOAD_TIMEOUT)), silent = TRUE)
+    raix_env$first_call <- FALSE
   }
+  
+  if (inherits(resp, "try-error")) {
+    msg <- trimws(as.character(resp))
+    if (grepl("[Tt]imeout|timed out", msg)) {
+      cli::cli_abort(c("raix: {raix_env$provider} model '{raix_env$model}' took too long to respond",
+        "i" = "Large models need 30-90s for first load into RAM",
+        "i" = "Try again — subsequent calls will be faster",
+        "i" = "Or use a smaller model: raix_configure(model = 'phi3.5')"))
+    } else if (grepl("[Rr]efused|refused", msg)) {
+      cli::cli_abort(c("raix: {raix_env$provider} is not running at {raix_env$base_url}",
+        "i" = "Start Ollama: open terminal and run 'ollama serve'",
+        "i" = "Or switch provider: raix_setup()"))
+    } else {
+      cli::cli_abort(c("raix: cannot reach {raix_env$provider}",
+        "i" = "URL: {url}", "x" = "{msg}"))
+    }
+  }
+  
   if (httr::http_error(resp)) {
     content <- tryCatch(httr::content(resp, "text", encoding = "UTF-8"), error = function(e) "(unreadable)")
-	    cli::cli_abort(c("raix: HTTP {httr::status_code(resp)} from {raix_env$provider}",
-      "x" = "{substr(content,1,300)}"))
+    code <- httr::status_code(resp)
+    if (code == 404) {
+      cli::cli_abort(c("raix: model '{raix_env$model}' not found on {raix_env$provider}",
+        "i" = "List models: run 'ollama list' in terminal",
+        "i" = "Pull model: run 'ollama pull {raix_env$model}'",
+        "i" = "Check available models: raix_setup() to auto-detect"))
+    } else {
+      cli::cli_abort(c("raix: HTTP {code} from {raix_env$provider}",
+        "x" = "{substr(content,1,300)}"))
+    }
   }
+  
+  # Mark first call as done
+  raix_env$first_call <- FALSE
+  
   parsed <- tryCatch(httr::content(resp, "parsed", encoding = "UTF-8"),
     error = function(e) cli::cli_abort("raix: cannot parse response"))
   keys <- strsplit(field, "\\.")[[1]]; result <- parsed

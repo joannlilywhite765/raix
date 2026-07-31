@@ -37,6 +37,7 @@ raix_env$system_prompt <- paste0(
 raix_env$temperature  <- 0.2
 raix_env$max_tokens   <- 2048
 raix_env$chat_history <- list()
+raix_env$first_call   <- TRUE   # Track first inference (cold model loading)
 
 # Small-model optimized system prompt
 SMALL_SYSTEM_PROMPT <- paste0(
@@ -183,7 +184,10 @@ raix_configure <- function(provider = NULL, model = NULL, api_key = NULL,
     }
   }
 
-  if (!is.null(model))        raix_env$model        <- model
+  if (!is.null(model)) {
+    if (model != raix_env$model) raix_env$first_call <- TRUE  # new model = cold start
+    raix_env$model <- model
+  }
   if (!is.null(api_key))      raix_env$api_key      <- api_key
   if (!is.null(system_prompt)) raix_env$system_prompt <- system_prompt
   if (!is.null(temperature))  raix_env$temperature  <- temperature
