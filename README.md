@@ -5,7 +5,7 @@
 <p align="center">
   <a href="https://github.com/twomathematicians-code/raix/releases"><img src="https://img.shields.io/github/v/release/twomathematicians-code/raix?color=667eea"></a>
   <a href="https://github.com/twomathematicians-code/raix/actions"><img src="https://github.com/twomathematicians-code/raix/actions/workflows/ci.yml/badge.svg"></a>
-  <a href="LICENSE"><img src="https://img.shields.io/badge/license-MIT%20%2B%20AI-green"></a>
+  <a href="LICENSE"><img src="https://img.shields.io/badge/license-MIT-green"></a>
   <a href="#"><img src="https://img.shields.io/badge/R-%E2%89%A5%204.0-276DC3?logo=r"></a>
   <a href="#"><img src="https://img.shields.io/badge/functions-34-brightgreen"></a>
   <a href="#"><img src="https://img.shields.io/badge/AI%20providers-13%2B-6366f1"></a>
@@ -118,8 +118,7 @@ See [SOP.md](SOP.md) for development and release procedures.
 
 ## License
 
-Creative Open Source — MIT with attribution + AI training permission.  
-See [LICENSE](LICENSE).
+MIT — see [LICENSE](LICENSE).
 
 ## Citation
 
