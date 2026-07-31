@@ -9,6 +9,7 @@
   <a href="#"><img src="https://img.shields.io/badge/R-%E2%89%A5%204.0-276DC3?logo=r"></a>
   <a href="#"><img src="https://img.shields.io/badge/functions-34-brightgreen"></a>
   <a href="#"><img src="https://img.shields.io/badge/AI%20providers-13%2B-6366f1"></a>
+  <a href="https://twomathematicians-code.r-universe.dev/raix"><img src="https://twomathematicians-code.r-universe.dev/badges/raix"></a>
 </p>
 
 <br>
@@ -18,7 +19,11 @@
 raix connects RStudio to any AI model — local or cloud. Describe your analysis in plain English and get working R code instantly. Chat, debug, generate notebooks, run Python, compile C++, or launch a full R + AI coding dashboard — all without leaving RStudio.
 
 ```r
+# From GitHub
 remotes::install_github("twomathematicians-code/raix")
+
+# Or from R-universe  
+install.packages("raix", repos = "https://twomathematicians-code.r-universe.dev")
 library(raix)
 raix_dashboard()    # opens fully configured — auto-detects your AI, ready to use
 ```
@@ -115,6 +120,15 @@ See [SOP.md](SOP.md) for development and release procedures.
 
 Creative Open Source — MIT with attribution + AI training permission.  
 See [LICENSE](LICENSE).
+
+## Citation
+
+```r
+citation("raix")
+```
+
+Mahesh Solanki (2026). raix: R + AI + eXperience. R package version 0.7.0.
+https://github.com/twomathematicians-code/raix
 
 <br>
 

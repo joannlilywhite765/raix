@@ -1,0 +1,24 @@
+During startup - Warning message:
+Setting LC_CTYPE=C.UTF-8 failed 
+* installing *source* package 'raix' ...
+** this is package 'raix' version '0.7.0'
+** using staged installation
+** R
+** inst
+** byte-compile and prepare package for lazy loading
+During startup - Warning message:
+Setting LC_CTYPE=C.UTF-8 failed 
+** help
+*** installing help indices
+*** copying figures
+** building package indices
+During startup - Warning message:
+Setting LC_CTYPE=C.UTF-8 failed 
+** testing if installed package can be loaded from temporary location
+During startup - Warning message:
+Setting LC_CTYPE=C.UTF-8 failed 
+** testing if installed package can be loaded from final location
+During startup - Warning message:
+Setting LC_CTYPE=C.UTF-8 failed 
+** testing if installed package keeps a record of temporary installation path
+* DONE (raix)

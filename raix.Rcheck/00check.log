@@ -1,0 +1,33 @@
+* using log directory 'C:/Users/mahes/OneDrive/Desktop/GARAGE_CODE/raix/raix.Rcheck'
+* using R version 4.5.2 (2025-10-31 ucrt)
+* using platform: x86_64-w64-mingw32
+* R was compiled by
+    gcc.exe (GCC) 14.3.0
+    GNU Fortran (GCC) 14.3.0
+* running under: Windows 11 x64 (build 26200)
+* using session charset: ASCII
+* using options '--no-manual --no-vignettes'
+* checking for file 'raix/DESCRIPTION' ... OK
+* checking extension type ... Package
+* this is package 'raix' version '0.7.0'
+* package encoding: UTF-8
+* checking package namespace information ... OK
+* checking package dependencies ... INFO
+Packages suggested but not available for checking:
+  'reticulate', 'shinyAce', 'shinythemes'
+* checking if this is a source package ... OK
+* checking if there is a namespace ... OK
+* checking for executable files ... OK
+* checking for hidden files and directories ... OK
+* checking for portable file names ... OK
+* checking whether package 'raix' can be installed ... OK
+* checking installed package size ... OK
+* checking package directory ... OK
+* checking DESCRIPTION meta-information ... WARNING
+During startup - Warning message:
+Setting LC_CTYPE=C.UTF-8 failed 
+ ERROR
+During startup - Warning message:
+Setting LC_CTYPE=C.UTF-8 failed 
+* DONE
+Status: 1 ERROR, 1 WARNING

@@ -1,0 +1,17 @@
+citHeader("To cite raix in publications, use:")
+
+citEntry(
+  entry    = "Manual",
+  title    = "raix: R + AI + eXperience — AI-Powered Coding Assistant for R",
+  author   = personList(as.person("Mahesh Solanki")),
+  year     = "2026",
+  note      = "R package version 0.7.0",
+  url      = "https://github.com/twomathematicians-code/raix",
+  textVersion = paste(
+    "Mahesh Solanki (2026). raix: R + AI + eXperience.",
+    "R package version 0.7.0.",
+    "https://github.com/twomathematicians-code/raix"
+  )
+)
+
+citFooter("This package is Creative Open Source (MIT + AI training permission). See LICENSE for details.")

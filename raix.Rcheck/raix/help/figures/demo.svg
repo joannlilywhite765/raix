@@ -1,0 +1,96 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 420" width="800" height="420">
+  <defs>
+    <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#0f172a"/>
+      <stop offset="100%" style="stop-color:#1e293b"/>
+    </linearGradient>
+    <linearGradient id="titleGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" style="stop-color:#276DC3"/>
+      <stop offset="50%" style="stop-color:#6366f1"/>
+      <stop offset="100%" style="stop-color:#818cf8"/>
+    </linearGradient>
+    <filter id="glow">
+      <feGaussianBlur stdDeviation="3" result="blur"/>
+      <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+  </defs>
+  
+  <rect width="800" height="420" rx="16" fill="url(#bg)"/>
+  
+  <!-- Window title bar -->
+  <rect width="800" height="36" rx="16" fill="#1e293b"/>
+  <rect y="16" width="800" height="20" fill="#1e293b"/>
+  <circle cx="24" cy="18" r="6" fill="#ef4444"/>
+  <circle cx="44" cy="18" r="6" fill="#f59e0b"/>
+  <circle cx="64" cy="18" r="6" fill="#22c55e"/>
+  <text x="780" y="24" font-family="monospace" font-size="13" fill="#64748b" text-anchor="end">raix · RStudio</text>
+  
+  <!-- Title -->
+  <text x="400" y="80" font-family="monospace" font-size="36" font-weight="bold" fill="url(#titleGrad)" text-anchor="middle" filter="url(#glow)">raix</text>
+  <text x="400" y="108" font-family="sans-serif" font-size="14" fill="#64748b" text-anchor="middle">R + AI + eXperience</text>
+  
+  <!-- Terminal section -->
+  <rect x="40" y="135" width="720" height="260" rx="10" fill="#020617" stroke="#334155" stroke-width="1"/>
+  
+  <!-- Line 1: R prompt (visible) -->
+  <text x="60" y="165" font-family="monospace" font-size="13" fill="#22c55e">&gt;</text>
+  <text x="76" y="165" font-family="monospace" font-size="13" fill="#e2e8f0">library(raix)</text>
+  
+  <!-- Line 2: Config -->
+  <text x="60" y="190" font-family="monospace" font-size="13" fill="#22c55e">&gt;</text>
+  <text x="76" y="190" font-family="monospace" font-size="13" fill="#e2e8f0">air_configure(provider = "ollama")</text>
+  
+  <!-- Line 3: Prompt (animated typing) -->
+  <text x="60" y="215" font-family="monospace" font-size="13" fill="#22c55e">&gt;</text>
+  <text x="76" y="215" font-family="monospace" font-size="13" fill="#e2e8f0">air_generate("Create a ggplot2 scatter plot")</text>
+  <line x1="370" y1="218" x2="374" y2="218" stroke="#22c55e" stroke-width="2">
+    <animate attributeName="opacity" values="1;0;1" dur="1s" repeatCount="indefinite"/>
+  </line>
+  
+  <!-- Line 4: AI response header -->
+  <text x="60" y="245" font-family="monospace" font-size="13" fill="#818cf8" opacity="0">AI</text>
+  <text x="76" y="245" font-family="monospace" font-size="13" fill="#94a3b8" opacity="0">
+    <animate attributeName="opacity" values="0;0;1" dur="3s" repeatCount="indefinite"/>
+  </text>
+  
+  <!-- Line 5-7: AI response code -->
+  <text x="76" y="268" font-family="monospace" font-size="12" fill="#94a3b8" opacity="0">
+    library(ggplot2)
+    <animate attributeName="opacity" values="0;0;0;1" dur="4s" repeatCount="indefinite"/>
+  </text>
+  <text x="76" y="288" font-family="monospace" font-size="12" fill="#94a3b8" opacity="0">
+    ggplot(mtcars, aes(x = wt, y = mpg)) +
+    <animate attributeName="opacity" values="0;0;0;0;1" dur="5s" repeatCount="indefinite"/>
+  </text>
+  <text x="76" y="308" font-family="monospace" font-size="12" fill="#94a3b8" opacity="0">
+      geom_point(aes(color = cyl), size = 3) +
+    <animate attributeName="opacity" values="0;0;0;0;0;1" dur="6s" repeatCount="indefinite"/>
+  </text>
+  <text x="76" y="328" font-family="monospace" font-size="12" fill="#94a3b8" opacity="0">
+      theme_minimal()
+    <animate attributeName="opacity" values="0;0;0;0;0;0;1" dur="7s" repeatCount="indefinite"/>
+  </text>
+  
+  <!-- Sparkle on code output -->
+  <text x="710" y="308" font-family="monospace" font-size="12" fill="#fbbf24" opacity="0">
+    ✦
+    <animate attributeName="opacity" values="0;0;0;0;0;0;0;1;0" dur="7s" repeatCount="indefinite"/>
+  </text>
+  
+  <!-- Bottom stats bar -->
+  <rect x="40" y="360" width="720" height="40" rx="8" fill="#1e293b" opacity="0.8"/>
+  
+  <text x="70" y="384" font-family="monospace" font-size="11" fill="#64748b">
+    17 functions  ·  13+ providers  ·  Chat GUI  ·  RStudio Add-in
+  </text>
+  
+  <!-- Provider icons row -->
+  <g transform="translate(280, 375)" opacity="0.6">
+    <text x="0" y="0" font-family="monospace" font-size="10" fill="#e2e8f0">Ollama</text>
+    <text x="54" y="0" font-family="monospace" font-size="10" fill="#22c55e">OpenAI</text>
+    <text x="108" y="0" font-family="monospace" font-size="10" fill="#d97706">Claude</text>
+    <text x="168" y="0" font-family="monospace" font-size="10" fill="#6366f1">DeepSeek</text>
+    <text x="238" y="0" font-family="monospace" font-size="10" fill="#8b5cf6">Groq</text>
+    <text x="276" y="0" font-family="monospace" font-size="10" fill="#64748b">+more</text>
+  </g>
+</svg>
